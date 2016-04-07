@@ -29,6 +29,9 @@
 
   <!--<logger name="com.avaje.ebeaninternal.server.cluster" level="TRACE"/>-->
 
+  <logger name="org.apache.ignite" level="INFO" />
+  <logger name="main.Server" level="TRACE"/>
+
   <logger name="org.avaje.ebean.Cluster" level="TRACE"/>
 
   <logger name="org.avaje.ebean.SQL" level="TRACE"/>

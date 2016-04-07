@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<l2Configuration xmlns="http://ebean-orm.github.io/xml/ns/ignite">
+
+  <base>
+    <cacheMode>PARTITIONED</cacheMode>
+  </base>
+
+  <apply>
+
+    <match match="efoo" type="BEAN">
+      <config>
+        <nearSize>500</nearSize>
+      </config>
+    </match>
+
+    <match match="country" type="BEAN">
+      <config>
+        <backups>0</backups>
+        <cacheMode>REPLICATED</cacheMode>
+      </config>
+    </match>
+
+  </apply>
+
+</l2Configuration>

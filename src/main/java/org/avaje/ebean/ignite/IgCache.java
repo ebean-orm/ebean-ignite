@@ -5,6 +5,7 @@ import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheStatistics;
 import org.apache.ignite.IgniteCache;
+import org.apache.ignite.cache.CacheMetrics;
 
 /**
  * IgniteCache adaptor to ServerCache
@@ -35,6 +36,7 @@ class IgCache implements ServerCache {
   @Override
   @SuppressWarnings("unchecked")
   public Object get(Object id) {
+    //cache.
     return cache.get(id);
   }
 
@@ -69,6 +71,8 @@ class IgCache implements ServerCache {
 
   @Override
   public ServerCacheStatistics getStatistics(boolean reset) {
+    //CacheMetrics metrics = cache.metrics();
+    //metrics.
     return null;
   }
 }

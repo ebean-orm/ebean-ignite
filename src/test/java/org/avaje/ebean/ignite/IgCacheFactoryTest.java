@@ -20,7 +20,7 @@ public class IgCacheFactoryTest {
   Server igniteServer;
 
   public IgCacheFactoryTest() {
-    igniteServer = new Server();
+    igniteServer = new Server("testServer");
     server = Ebean.getDefaultServer();
   }
 
@@ -72,6 +72,36 @@ public class IgCacheFactoryTest {
     assertNotNull(fetch3);
     assertEquals(fetch3.getNotes(), "ModNotes");
     assertEquals(fetch3.getName(), "hello");
+  }
+
+  @Test
+  public void queryCache() {
+
+    new EFoo("one1").save();
+    new EFoo("one2").save();
+    new EFoo("one3").save();
+
+    Ebean.find(EFoo.class)
+        .setUseQueryCache(true)
+        .where().startsWith("name", "one")
+        .findList();
+
+    Ebean.find(EFoo.class)
+        .setUseQueryCache(true)
+        .where().startsWith("name", "one")
+        .findList();
+
+    new EFoo("one4").save();
+
+    Ebean.find(EFoo.class)
+        .setUseQueryCache(true)
+        .where().startsWith("name", "one")
+        .findList();
+
+    Ebean.find(EFoo.class)
+        .setUseQueryCache(true)
+        .where().startsWith("name", "one")
+        .findList();
 
   }
 }

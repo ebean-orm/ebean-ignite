@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="http://ebean-orm.github.io/xml/ns/ignite"
+           targetNamespace="http://ebean-orm.github.io/xml/ns/ignite" elementFormDefault="qualified">
+
+  <xs:element name="l2Configuration">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="base" type="l2CacheConfig" minOccurs="0"/>
+        <xs:element name="baseBean" type="l2CacheConfig" minOccurs="0"/>
+        <xs:element name="baseKey" type="l2CacheConfig" minOccurs="0"/>
+        <xs:element name="baseAssocManyIds" type="l2CacheConfig" minOccurs="0"/>
+        <xs:element name="baseQuery" type="l2CacheConfig" minOccurs="0"/>
+        <xs:element name="apply" type="l2Apply" minOccurs="0" />
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:complexType name="l2Apply">
+    <xs:sequence>
+      <xs:element name="match" type="l2CacheMatch" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="l2CacheConfig">
+    <xs:all>
+      <xs:element name="atomicWriteOrderMode" type="cacheAtomicWriteOrderMode" minOccurs="0"/>
+      <xs:element name="atomicityMode" type="cacheAtomicityMode" minOccurs="0"/>
+      <xs:element name="backups" type="xs:int" minOccurs="0"/>
+      <xs:element name="cacheMode" type="cacheMode" minOccurs="0"/>
+      <xs:element name="cpOnRead" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="dfltLockTimeout" type="xs:long" minOccurs="0"/>
+      <xs:element name="eagerTtl" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="evictKeyBufSize" type="xs:int" minOccurs="0"/>
+      <xs:element name="evictMaxOverflowRatio" type="xs:float" minOccurs="0"/>
+      <xs:element name="evictSync" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="evictSyncConcurrencyLvl" type="xs:int" minOccurs="0"/>
+      <xs:element name="evictSyncTimeout" type="xs:long" minOccurs="0"/>
+      <xs:element name="invalidate" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="loadPrevVal" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="longQryWarnTimeout" type="xs:long" minOccurs="0"/>
+      <xs:element name="maxConcurrentAsyncOps" type="xs:int" minOccurs="0"/>
+      <xs:element name="memMode" type="cacheMemoryMode" minOccurs="0"/>
+      <xs:element name="name" type="xs:string" minOccurs="0"/>
+      <xs:element name="nearSize" type="xs:int" minOccurs="0"/>
+      <xs:element name="offHeapMaxMem" type="xs:long" minOccurs="0"/>
+      <xs:element name="readFromBackup" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="rebalanceBatchSize" type="xs:int" minOccurs="0"/>
+      <xs:element name="rebalanceBatchesPrefetchCount" type="xs:long" minOccurs="0"/>
+      <xs:element name="rebalanceDelay" type="xs:long" minOccurs="0"/>
+      <xs:element name="rebalanceMode" type="cacheRebalanceMode" minOccurs="0"/>
+      <xs:element name="rebalanceOrder" type="xs:int" minOccurs="0"/>
+      <xs:element name="rebalanceThrottle" type="xs:long" minOccurs="0"/>
+      <xs:element name="rebalanceTimeout" type="xs:long" minOccurs="0"/>
+      <xs:element name="snapshotableIdx" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="startSize" type="xs:int" minOccurs="0"/>
+      <xs:element name="storeConcurrentLoadAllThreshold" type="xs:int" minOccurs="0"/>
+      <xs:element name="storeKeepBinary" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="swapEnabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="tmLookupClsName" type="xs:string" minOccurs="0"/>
+      <xs:element name="writeBehindBatchSize" type="xs:int" minOccurs="0"/>
+      <xs:element name="writeBehindEnabled" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="writeBehindFlushFreq" type="xs:long" minOccurs="0"/>
+      <xs:element name="writeBehindFlushSize" type="xs:int" minOccurs="0"/>
+      <xs:element name="writeBehindFlushThreadCnt" type="xs:int" minOccurs="0"/>
+      <xs:element name="writeSync" type="cacheWriteSynchronizationMode" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:complexType name="l2CacheMatch">
+    <xs:all>
+      <xs:element name="config" type="l2CacheConfig" minOccurs="0"/>
+    </xs:all>
+    <xs:attribute name="match" type="xs:string" use="required" />
+    <xs:attribute name="type" type="serverCacheType" use="optional" />
+  </xs:complexType>
+
+  <xs:simpleType name="cacheAtomicWriteOrderMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PRIMARY"/>
+      <xs:enumeration value="CLOCK"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="cacheAtomicityMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ATOMIC"/>
+      <xs:enumeration value="TRANSACTIONAL"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="cacheMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="LOCAL"/>
+      <xs:enumeration value="REPLICATED"/>
+      <xs:enumeration value="PARTITIONED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="cacheMemoryMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ONHEAP_TIERED"/>
+      <xs:enumeration value="OFFHEAP_VALUES"/>
+      <xs:enumeration value="OFFHEAP_TIERED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="cacheRebalanceMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NONE"/>
+      <xs:enumeration value="ASYNC"/>
+      <xs:enumeration value="SYNC"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="cacheWriteSynchronizationMode">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="FULL_ASYNC"/>
+      <xs:enumeration value="PRIMARY_SYNC"/>
+      <xs:enumeration value="FULL_SYNC"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="serverCacheType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="QUERY"/>
+      <xs:enumeration value="BEAN"/>
+      <xs:enumeration value="NATURAL_KEY"/>
+      <xs:enumeration value="COLLECTION_IDS"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+
