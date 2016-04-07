@@ -13,7 +13,6 @@ import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteMessaging;
 import org.apache.ignite.IgniteSet;
 import org.apache.ignite.Ignition;
-import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.configuration.CollectionConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.lang.IgniteBiPredicate;
@@ -52,8 +51,6 @@ public class IgCacheFactory implements ServerCacheFactory {
 
   private IgniteSet<String> queryCacheKeys;
 
-  private IgniteCache<Object, Object> l2QueryCacheNames;
-
   private SpiServer pluginServer;
 
   public IgCacheFactory() {
@@ -84,16 +81,7 @@ public class IgCacheFactory implements ServerCacheFactory {
     queryCacheInvalidate.localListen(QC_INVALIDATE, new QueryCacheInvalidateListener());
     queryCacheInvalidate.localListen(QC_CREATE, new QueryCacheCreatedListener());
 
-    l2QueryCacheNames = ignite.getOrCreateCache("l2QueryCacheNames");
-
-    CollectionConfiguration setCon = new CollectionConfiguration();
-    //setCon.setCacheMode(CacheMode.REPLICATED);
-    queryCacheKeys = ignite.set("queryCacheNames", setCon);
-  }
-
-  @Override
-  public void initQueryCache() {
-
+    queryCacheKeys = ignite.set("queryCacheNames", new CollectionConfiguration());
 
     for (String key : queryCacheKeys) {
       try {
@@ -113,14 +101,6 @@ public class IgCacheFactory implements ServerCacheFactory {
       return true;
     }
   }
-
-//  private class QueryCacheInitListener implements IgniteBiPredicate<UUID, String> {
-//    @Override
-//    public boolean apply(UUID uuid, String key) {
-//      queryCacheInit(key);
-//      return true;
-//    }
-//  }
 
   private class QueryCacheInvalidateListener implements IgniteBiPredicate<UUID, String> {
     @Override
