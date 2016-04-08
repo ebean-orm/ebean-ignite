@@ -5,16 +5,19 @@ import org.apache.ignite.configuration.CacheConfiguration;
 /**
  * Adds configuration together.
  */
-public class AddL2CacheConfig {
+class AddL2CacheConfig {
 
-  public static L2CacheConfig add(L2CacheConfig base, L2CacheConfig apply) {
+  /**
+   * Add the apply configuration to base and return the combined configuration.
+   */
+  static L2CacheConfig add(L2CacheConfig base, L2CacheConfig apply) {
 
-    L2CacheConfig newCofig = new L2CacheConfig();
-    apply(newCofig, base);
+    L2CacheConfig newConfig = new L2CacheConfig();
+    apply(newConfig, base);
     if (apply != null) {
-      apply(newCofig, apply);
+      apply(newConfig, apply);
     }
-    return newCofig;
+    return newConfig;
   }
 
   private static void apply(L2CacheConfig to, L2CacheConfig from) {
@@ -135,7 +138,7 @@ public class AddL2CacheConfig {
     }
   }
 
-  public static void apply(CacheConfiguration to, L2CacheConfig from) {
+  static void apply(CacheConfiguration to, L2CacheConfig from) {
 
     if (from.atomicityMode != null) {
       to.setAtomicityMode(from.atomicityMode);

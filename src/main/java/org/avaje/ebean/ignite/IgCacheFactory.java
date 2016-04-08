@@ -30,6 +30,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Factory for creating L2 server caches with Apache Ignite.
+ * <p>
+ * The L2 Query cache is effectively an always near/no server cache and we
+ * use Ignite to send/receive invalidation messages for the query caches.
+ * </p>
+ * <p>
+ * All the 'Bean' caches will typically be partitioned with a 'near' cache option.
+ * REPLICATED caches would be a good choice for small/stable bean types (countries, currencies etc).
+ * </p>
  */
 public class IgCacheFactory implements ServerCacheFactory {
 
@@ -47,7 +55,7 @@ public class IgCacheFactory implements ServerCacheFactory {
 
   private Ignite ignite;
 
-  private IgniteMessaging queryCacheInvalidate;
+  private IgniteMessaging messaging;
 
   private IgniteSet<String> queryCacheKeys;
 
@@ -55,8 +63,12 @@ public class IgCacheFactory implements ServerCacheFactory {
 
   public IgCacheFactory() {
     this.queryCaches = new ConcurrentHashMap<>();
+
+    // read configuration from application resource
     L2Configuration l2Configuration = ConfigXmlReader.read("/ebean-ignite-config.xml");
     this.configManager = new ConfigManager(l2Configuration);
+
+    // maybe read additional configuration from file system? to override?
   }
 
   @Override
@@ -65,8 +77,11 @@ public class IgCacheFactory implements ServerCacheFactory {
     pluginServer = ebeanServer.getPluginApi();
 
     ServerConfig serverConfig = ebeanServer.getPluginApi().getServerConfig();
+
+    // get IgniteConfiguration (when programmatically set into ServerConfig - DI setup)
     IgniteConfiguration configuration = (IgniteConfiguration) serverConfig.getServiceObject("igniteConfiguration");
     if (configuration == null) {
+      // just going with defaults
       configuration = new IgniteConfiguration();
       configuration.setClientMode(true);
     }
@@ -77,12 +92,14 @@ public class IgCacheFactory implements ServerCacheFactory {
 
     logger.debug("Starting Ignite");
     ignite = Ignition.start(configuration);
-    queryCacheInvalidate = ignite.message(ignite.cluster().forRemotes());
-    queryCacheInvalidate.localListen(QC_INVALIDATE, new QueryCacheInvalidateListener());
-    queryCacheInvalidate.localListen(QC_CREATE, new QueryCacheCreatedListener());
 
+    messaging = ignite.message(ignite.cluster().forRemotes());
+    messaging.localListen(QC_INVALIDATE, new QueryCacheInvalidateListener());
+    messaging.localListen(QC_CREATE, new QueryCacheCreatedListener());
+
+    // find all the query caches that have been started and register
+    // them early so that we immediately invalidate as necessary
     queryCacheKeys = ignite.set("queryCacheNames", new CollectionConfiguration());
-
     for (String key : queryCacheKeys) {
       try {
         logger.info("init query cache for {}", key);
@@ -139,17 +156,23 @@ public class IgCacheFactory implements ServerCacheFactory {
     return new IgCache(cache);
   }
 
+  /**
+   * Return the full cache name (JMX safe name).
+   */
   @NotNull
   private String fullName(ServerCacheType type, String key) {
     return type.name() + "-" + key;
   }
 
+  /**
+   * Create a local/near query cache.
+   */
   private ServerCache createQueryCache(String key) {
 
     synchronized (this) {
       IgQueryCache cache = queryCaches.get(key);
       if (cache == null) {
-        sendCacheCreated(key);
+        sendQueryCacheCreated(key);
         cache = new IgQueryCache(key, new ServerCacheOptions());
         queryCaches.put(key, cache);
       }
@@ -172,7 +195,7 @@ public class IgCacheFactory implements ServerCacheFactory {
     @Override
     public void clear() {
       super.clear();
-      sendInvalidation(name);
+      sendQueryCacheInvalidation(name);
     }
 
     /**
@@ -187,27 +210,33 @@ public class IgCacheFactory implements ServerCacheFactory {
   /**
    * Send the invalidation message to all members of the cluster.
    */
-  private void sendInvalidation(String key) {
-    //logger.trace("send query cache invalidation key[{}] ", key);
-    queryCacheInvalidate.send(QC_INVALIDATE, key);
+  private void sendQueryCacheInvalidation(String key) {
+    messaging.send(QC_INVALIDATE, key);
   }
 
-  private void sendCacheCreated(String key) {
+  /**
+   * Send the query cache created message to all members of the cluster.
+   */
+  private void sendQueryCacheCreated(String key) {
     logger.info("send query cache created key[{}] ", key);
     queryCacheKeys.add(key);
-    queryCacheInvalidate.send(QC_CREATE, key);
+    messaging.send(QC_CREATE, key);
   }
 
+  /**
+   * Clear the query cache if we have it.
+   */
   private void queryCacheInvalidate(String key) {
-    //logger.trace("received query cache invalidation key[{}] ", key);
     IgQueryCache queryCache = queryCaches.get(key);
     if (queryCache != null) {
       queryCache.invalidate();
     }
   }
 
+  /**
+   * A node in the cluster created this query cache so we need to as well.
+   */
   private void queryCacheCreated(String key) {
-    //logger.trace("received query cache invalidation key[{}] ", key);
     IgQueryCache queryCache = queryCaches.get(key);
     if (queryCache != null) {
       queryLogger.debug("   cluster creating cache {}", key);

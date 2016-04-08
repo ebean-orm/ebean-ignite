@@ -110,7 +110,7 @@ public class ConfigManager {
   /**
    * Return the base configuration based on the cache type.
    */
-  L2CacheConfig getBase(ServerCacheType type) {
+  private L2CacheConfig getBase(ServerCacheType type) {
     switch (type) {
       case QUERY:
         return baseQuery;
