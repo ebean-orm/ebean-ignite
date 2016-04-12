@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="base" type="{http://ebean-orm.github.io/xml/ns/ignite}l2CacheConfig" minOccurs="0"/>
  *         &lt;element name="baseBean" type="{http://ebean-orm.github.io/xml/ns/ignite}l2CacheConfig" minOccurs="0"/>
  *         &lt;element name="baseKey" type="{http://ebean-orm.github.io/xml/ns/ignite}l2CacheConfig" minOccurs="0"/>
- *         &lt;element name="baseAssocManyIds" type="{http://ebean-orm.github.io/xml/ns/ignite}l2CacheConfig" minOccurs="0"/>
+ *         &lt;element name="baseManyIds" type="{http://ebean-orm.github.io/xml/ns/ignite}l2CacheConfig" minOccurs="0"/>
  *         &lt;element name="baseQuery" type="{http://ebean-orm.github.io/xml/ns/ignite}l2CacheConfig" minOccurs="0"/>
  *         &lt;element name="apply" type="{http://ebean-orm.github.io/xml/ns/ignite}l2Apply" minOccurs="0"/>
  *       &lt;/all>
@@ -41,7 +41,7 @@ public class L2Configuration {
     protected L2CacheConfig base;
     protected L2CacheConfig baseBean;
     protected L2CacheConfig baseKey;
-    protected L2CacheConfig baseAssocManyIds;
+    protected L2CacheConfig baseManyIds;
     protected L2CacheConfig baseQuery;
     protected L2Apply apply;
 
@@ -118,27 +118,27 @@ public class L2Configuration {
     }
 
     /**
-     * Gets the value of the baseAssocManyIds property.
+     * Gets the value of the baseManyIds property.
      * 
      * @return
      *     possible object is
      *     {@link L2CacheConfig }
      *     
      */
-    public L2CacheConfig getBaseAssocManyIds() {
-        return baseAssocManyIds;
+    public L2CacheConfig getBaseManyIds() {
+        return baseManyIds;
     }
 
     /**
-     * Sets the value of the baseAssocManyIds property.
+     * Sets the value of the baseManyIds property.
      * 
      * @param value
      *     allowed object is
      *     {@link L2CacheConfig }
      *     
      */
-    public void setBaseAssocManyIds(L2CacheConfig value) {
-        this.baseAssocManyIds = value;
+    public void setBaseManyIds(L2CacheConfig value) {
+        this.baseManyIds = value;
     }
 
     /**

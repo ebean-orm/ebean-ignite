@@ -22,7 +22,7 @@ public class ConfigManager {
   private final L2CacheConfig baseQuery;
   private final L2CacheConfig baseBean;
   private final L2CacheConfig baseKey;
-  private final L2CacheConfig baseAssocManyIds;
+  private final L2CacheConfig baseManyIds;
 
   /**
    * Create given the configuration.
@@ -35,7 +35,7 @@ public class ConfigManager {
     this.baseQuery = add(base, configuration.getBaseQuery());
     this.baseBean = add(base, configuration.getBaseBean());
     this.baseKey = add(base, configuration.getBaseKey());
-    this.baseAssocManyIds = add(base, configuration.getBaseAssocManyIds());
+    this.baseManyIds = add(base, configuration.getBaseManyIds());
   }
 
   /**
@@ -64,7 +64,7 @@ public class ConfigManager {
       List<L2CacheMatch> match = apply.getMatch();
       for (L2CacheMatch l2CacheMatch : match) {
         if (isMatch(type, key, l2CacheMatch)) {
-          logger.debug("match for type[{}] key[{}] to config [{}]", type, key, l2CacheMatch.getMatch());
+          logger.debug("match for type[{}] key[{}] to config [{}]", type, key, l2CacheMatch);
           config = add(config, l2CacheMatch.getConfig());
         }
       }
@@ -99,12 +99,41 @@ public class ConfigManager {
 
   private boolean isMatch(ServerCacheType type, String key, L2CacheMatch l2CacheMatch) {
 
-    if (!type.equals(l2CacheMatch.getType())) {
-      return false;
+    switch (type) {
+      case QUERY:
+        return isMatch(l2CacheMatch.isTypeQuery(), key, l2CacheMatch);
+      case BEAN:
+        return isMatch(l2CacheMatch.isTypeBean(), key, l2CacheMatch);
+      case NATURAL_KEY:
+        return isMatch(l2CacheMatch.isTypeKey(), key, l2CacheMatch);
+      case COLLECTION_IDS:
+        return isMatch(l2CacheMatch.isTypeManyId(), key, l2CacheMatch);
+      default :
+        throw new IllegalStateException("Unknown type "+type);
     }
+  }
 
-    // just lower case contains for now
-    return key.toLowerCase().contains(l2CacheMatch.getMatch().toLowerCase());
+  private boolean isMatch(Boolean typeMatch, String key, L2CacheMatch l2CacheMatch) {
+    return isTrue(typeMatch) && isMatch(key, l2CacheMatch.getMatchClasses());
+  }
+
+  private boolean isMatch(String key, String matchClasses) {
+    String[] matches = matchClasses.split("[,;]");
+    for (int i = 0; i < matches.length; i++) {
+      String matcher = matches[i].trim();
+      if (!matcher.contains(".")) {
+        matcher = "." + matcher;
+        key = key.toLowerCase();
+      }
+      if (key.contains(matcher)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean isTrue(Boolean typeBean) {
+    return Boolean.TRUE.equals(typeBean);
   }
 
   /**
@@ -119,7 +148,7 @@ public class ConfigManager {
       case NATURAL_KEY:
         return baseKey;
       case COLLECTION_IDS:
-        return baseAssocManyIds;
+        return baseManyIds;
       default:
         throw new IllegalStateException("Invalid type " + type);
     }

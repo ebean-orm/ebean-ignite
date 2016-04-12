@@ -6,9 +6,10 @@
     <backups>0</backups>
   </base>
 
+
   <apply>
 
-    <match match="customer" type="BEAN">
+    <match matchClasses="customer" typeBean="true">
       <config>
         <backups>1</backups>
         <atomicWriteOrderMode>PRIMARY</atomicWriteOrderMode>
@@ -18,14 +19,14 @@
       </config>
     </match>
 
-    <match match="country" type="BEAN">
+    <match matchClasses="country,product" typeBean="true" typeKey="true">
       <config>
         <backups>0</backups>
         <cacheMode>REPLICATED</cacheMode>
       </config>
     </match>
 
-    <match match="customer" type="BEAN">
+    <match matchClasses=".Customer" typeBean="true">
       <config>
         <atomicWriteOrderMode>CLOCK</atomicWriteOrderMode>
       </config>

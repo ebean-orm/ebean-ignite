@@ -9,7 +9,7 @@
         <xs:element name="base" type="l2CacheConfig" minOccurs="0"/>
         <xs:element name="baseBean" type="l2CacheConfig" minOccurs="0"/>
         <xs:element name="baseKey" type="l2CacheConfig" minOccurs="0"/>
-        <xs:element name="baseAssocManyIds" type="l2CacheConfig" minOccurs="0"/>
+        <xs:element name="baseManyIds" type="l2CacheConfig" minOccurs="0"/>
         <xs:element name="baseQuery" type="l2CacheConfig" minOccurs="0"/>
         <xs:element name="apply" type="l2Apply" minOccurs="0" />
       </xs:all>
@@ -71,8 +71,11 @@
     <xs:all>
       <xs:element name="config" type="l2CacheConfig" minOccurs="0"/>
     </xs:all>
-    <xs:attribute name="match" type="xs:string" use="required" />
-    <xs:attribute name="type" type="serverCacheType" use="optional" />
+    <xs:attribute name="matchClasses" type="xs:string" use="required" />
+    <xs:attribute name="typeQuery" type="xs:boolean" use="optional" />
+    <xs:attribute name="typeBean" type="xs:boolean" use="optional" />
+    <xs:attribute name="typeKey" type="xs:boolean" use="optional" />
+    <xs:attribute name="typeManyId" type="xs:boolean" use="optional" />
   </xs:complexType>
 
   <xs:simpleType name="cacheAtomicWriteOrderMode">

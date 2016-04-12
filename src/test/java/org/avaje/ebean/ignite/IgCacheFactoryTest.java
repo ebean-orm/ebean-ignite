@@ -72,6 +72,15 @@ public class IgCacheFactoryTest {
     assertNotNull(fetch3);
     assertEquals(fetch3.getNotes(), "ModNotes");
     assertEquals(fetch3.getName(), "hello");
+
+
+    EFoo update2 = new EFoo();
+    update2.setId(foo.getId());
+    update2.setNotes("ModNotes");
+    update2.setVersion(fetch3.getVersion());
+    update2.update();
+
+    Thread.sleep(10);
   }
 
   @Test

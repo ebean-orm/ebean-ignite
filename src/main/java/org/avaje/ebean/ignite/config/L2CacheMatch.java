@@ -1,8 +1,6 @@
 
 package org.avaje.ebean.ignite.config;
 
-import com.avaje.ebean.cache.ServerCacheType;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -21,8 +19,11 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;all>
  *         &lt;element name="config" type="{http://ebean-orm.github.io/xml/ns/ignite}l2CacheConfig" minOccurs="0"/>
  *       &lt;/all>
- *       &lt;attribute name="match" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
- *       &lt;attribute name="type" type="{http://ebean-orm.github.io/xml/ns/ignite}serverCacheType" />
+ *       &lt;attribute name="matchClasses" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
+ *       &lt;attribute name="typeQuery" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="typeBean" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="typeKey" type="{http://www.w3.org/2001/XMLSchema}boolean" />
+ *       &lt;attribute name="typeManyId" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -37,10 +38,33 @@ import javax.xml.bind.annotation.XmlType;
 public class L2CacheMatch {
 
     protected L2CacheConfig config;
-    @XmlAttribute(name = "match", required = true)
-    protected String match;
-    @XmlAttribute(name = "type")
-    protected ServerCacheType type;
+    @XmlAttribute(name = "matchClasses", required = true)
+    protected String matchClasses;
+    @XmlAttribute(name = "typeQuery")
+    protected Boolean typeQuery;
+    @XmlAttribute(name = "typeBean")
+    protected Boolean typeBean;
+    @XmlAttribute(name = "typeKey")
+    protected Boolean typeKey;
+    @XmlAttribute(name = "typeManyId")
+    protected Boolean typeManyId;
+
+    public String toString() {
+        String val = "classes:"+matchClasses;
+        if (Boolean.TRUE.equals(typeQuery)) {
+            val += " typeQuery:true";
+        }
+        if (Boolean.TRUE.equals(typeBean)) {
+            val += " typeBean:true";
+        }
+        if (Boolean.TRUE.equals(typeKey)) {
+            val += " typeKey:true";
+        }
+        if (Boolean.TRUE.equals(typeManyId)) {
+            val += " typeManyId:true";
+        }
+        return val;
+    }
 
     /**
      * Gets the value of the config property.
@@ -67,51 +91,123 @@ public class L2CacheMatch {
     }
 
     /**
-     * Gets the value of the match property.
+     * Gets the value of the matchClasses property.
      * 
      * @return
      *     possible object is
      *     {@link String }
      *     
      */
-    public String getMatch() {
-        return match;
+    public String getMatchClasses() {
+        return matchClasses;
     }
 
     /**
-     * Sets the value of the match property.
+     * Sets the value of the matchClasses property.
      * 
      * @param value
      *     allowed object is
      *     {@link String }
      *     
      */
-    public void setMatch(String value) {
-        this.match = value;
+    public void setMatchClasses(String value) {
+        this.matchClasses = value;
     }
 
     /**
-     * Gets the value of the type property.
+     * Gets the value of the typeQuery property.
      * 
      * @return
      *     possible object is
-     *     {@link ServerCacheType }
+     *     {@link Boolean }
      *     
      */
-    public ServerCacheType getType() {
-        return type;
+    public Boolean isTypeQuery() {
+        return typeQuery;
     }
 
     /**
-     * Sets the value of the type property.
+     * Sets the value of the typeQuery property.
      * 
      * @param value
      *     allowed object is
-     *     {@link ServerCacheType }
+     *     {@link Boolean }
      *     
      */
-    public void setType(ServerCacheType value) {
-        this.type = value;
+    public void setTypeQuery(Boolean value) {
+        this.typeQuery = value;
+    }
+
+    /**
+     * Gets the value of the typeBean property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isTypeBean() {
+        return typeBean;
+    }
+
+    /**
+     * Sets the value of the typeBean property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setTypeBean(Boolean value) {
+        this.typeBean = value;
+    }
+
+    /**
+     * Gets the value of the typeKey property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isTypeKey() {
+        return typeKey;
+    }
+
+    /**
+     * Sets the value of the typeKey property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setTypeKey(Boolean value) {
+        this.typeKey = value;
+    }
+
+    /**
+     * Gets the value of the typeManyId property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isTypeManyId() {
+        return typeManyId;
+    }
+
+    /**
+     * Sets the value of the typeManyId property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setTypeManyId(Boolean value) {
+        this.typeManyId = value;
     }
 
 }
