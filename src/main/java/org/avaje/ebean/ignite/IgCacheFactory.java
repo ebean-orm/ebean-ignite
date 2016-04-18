@@ -21,10 +21,13 @@ import org.avaje.ebean.ignite.config.ConfigManager;
 import org.avaje.ebean.ignite.config.ConfigPair;
 import org.avaje.ebean.ignite.config.ConfigXmlReader;
 import org.avaje.ebean.ignite.config.L2Configuration;
+import org.avaje.ignite.IgniteConfigBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,8 +38,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * use Ignite to send/receive invalidation messages for the query caches.
  * </p>
  * <p>
- * All the 'Bean' caches will typically be partitioned with a 'near' cache option.
- * REPLICATED caches would be a good choice for small/stable bean types (countries, currencies etc).
+ * All the 'Bean' caches will typically be partitioned with an optional 'near' cache option or replicated.
+ * REPLICATED caches would be a good choice for small cardinality/stable bean types (countries, currencies etc).
  * </p>
  */
 public class IgCacheFactory implements ServerCacheFactory {
@@ -63,12 +66,32 @@ public class IgCacheFactory implements ServerCacheFactory {
 
   public IgCacheFactory() {
     this.queryCaches = new ConcurrentHashMap<>();
+    this.configManager = new ConfigManager(readConfiguration());
+  }
 
-    // read configuration from application resource
-    L2Configuration l2Configuration = ConfigXmlReader.read("/ebean-ignite-config.xml");
-    this.configManager = new ConfigManager(l2Configuration);
+  /**
+   * Read the L2 cache configuration.
+   */
+  private L2Configuration readConfiguration() {
 
-    // maybe read additional configuration from file system? to override?
+    // check system property first
+    String config = System.getProperty("ebeanIgniteConfig");
+    if (config != null) {
+      File file = new File(config);
+      if (!file.exists()) {
+        throw new IllegalStateException("ebean ignite configuration not found at " + config);
+      }
+      return ConfigXmlReader.read(file);
+    }
+
+    // look for local configuration external to the application
+    File file = new File("ebean-ignite-config.xml");
+    if (file.exists()) {
+      return ConfigXmlReader.read(file);
+    }
+
+    // look for configuration inside the application
+    return ConfigXmlReader.read("/ebean-ignite-config.xml");
   }
 
   @Override
@@ -78,12 +101,16 @@ public class IgCacheFactory implements ServerCacheFactory {
 
     ServerConfig serverConfig = ebeanServer.getPluginApi().getServerConfig();
 
-    // get IgniteConfiguration (when programmatically set into ServerConfig - DI setup)
+    // programmatically set into ServerConfig - typical DI setup
     IgniteConfiguration configuration = (IgniteConfiguration) serverConfig.getServiceObject("igniteConfiguration");
     if (configuration == null) {
-      // just going with defaults
-      configuration = new IgniteConfiguration();
-      configuration.setClientMode(true);
+
+      Properties properties = serverConfig.getProperties();
+      if (properties != null) {
+        configuration = new IgniteConfigBuilder("ignite", properties).build();
+      } else {
+        configuration = new IgniteConfiguration();
+      }
     }
 
     if (configuration.getGridLogger() == null) {
@@ -106,7 +133,7 @@ public class IgCacheFactory implements ServerCacheFactory {
         pluginServer.initQueryCache(key);
 
       } catch (Exception e) {
-        logger.error("Failed to initiate query cache for "+key, e);
+        logger.error("Failed to initiate query cache for " + key, e);
       }
     }
   }

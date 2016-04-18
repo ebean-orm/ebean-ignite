@@ -7,13 +7,13 @@
 
   <apply>
 
-    <match match="efoo" type="BEAN">
+    <match matchClasses="efoo" typeBean="true">
       <config>
         <nearSize>500</nearSize>
       </config>
     </match>
 
-    <match match="country" type="BEAN">
+    <match matchClasses="country" typeBean="true">
       <config>
         <backups>0</backups>
         <cacheMode>REPLICATED</cacheMode>

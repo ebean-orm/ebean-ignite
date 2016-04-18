@@ -21,20 +21,33 @@
 
   <properties>
     <java.version>1.7</java.version>
+    <ignite.version>1.5.0.final</ignite.version>
   </properties>
 
   <dependencies>
 
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>[1.7.12,)</version>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-slf4j</artifactId>
-      <version>1.5.0.final</version>
+      <version>${ignite.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.apache.ignite</groupId>
       <artifactId>ignite-core</artifactId>
-      <version>1.5.0.final</version>
+      <version>${ignite.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.avaje</groupId>
+      <artifactId>avaje-ignite-config</artifactId>
+      <version>1.1.1</version>
     </dependency>
 
     <dependency>
@@ -44,11 +57,7 @@
       <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>[1.7.12,)</version>
-    </dependency>
+    <!-- test dependencies -->
 
     <dependency>
       <groupId>org.avaje.composite</groupId>
