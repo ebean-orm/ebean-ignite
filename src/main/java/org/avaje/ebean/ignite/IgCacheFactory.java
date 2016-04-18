@@ -129,7 +129,7 @@ public class IgCacheFactory implements ServerCacheFactory {
     queryCacheKeys = ignite.set("queryCacheNames", new CollectionConfiguration());
     for (String key : queryCacheKeys) {
       try {
-        logger.info("init query cache for {}", key);
+        logger.debug("init query cache for {}", key);
         pluginServer.initQueryCache(key);
 
       } catch (Exception e) {
@@ -245,7 +245,6 @@ public class IgCacheFactory implements ServerCacheFactory {
    * Send the query cache created message to all members of the cluster.
    */
   private void sendQueryCacheCreated(String key) {
-    logger.info("send query cache created key[{}] ", key);
     queryCacheKeys.add(key);
     messaging.send(QC_CREATE, key);
   }
