@@ -1,8 +1,6 @@
 package org.avaje.ebean.ignite;
 
-import com.avaje.ebean.EbeanServer;
 import com.avaje.ebean.cache.ServerCache;
-import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheStatistics;
 import org.apache.ignite.IgniteCache;
 import org.slf4j.Logger;
@@ -19,22 +17,6 @@ class IgCache implements ServerCache {
 
   IgCache(IgniteCache cache) {
     this.cache = cache;
-  }
-
-  @Override
-  public void init(EbeanServer ebeanServer) {
-    // don't need the executor service from ebeanServer etc
-  }
-
-  @Override
-  public ServerCacheOptions getOptions() {
-    // we don't care ... use the xml configuration
-    return null;
-  }
-
-  @Override
-  public void setOptions(ServerCacheOptions options) {
-    // we don't care ... use the xml configuration
   }
 
   @Override

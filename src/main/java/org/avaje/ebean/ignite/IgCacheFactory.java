@@ -1,19 +1,16 @@
 package org.avaje.ebean.ignite;
 
-import com.avaje.ebean.EbeanServer;
+import com.avaje.ebean.BackgroundExecutor;
 import com.avaje.ebean.cache.ServerCache;
 import com.avaje.ebean.cache.ServerCacheFactory;
 import com.avaje.ebean.cache.ServerCacheOptions;
 import com.avaje.ebean.cache.ServerCacheType;
 import com.avaje.ebean.config.ServerConfig;
-import com.avaje.ebean.plugin.SpiServer;
 import com.avaje.ebeaninternal.server.cache.DefaultServerCache;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteMessaging;
-import org.apache.ignite.IgniteSet;
 import org.apache.ignite.Ignition;
-import org.apache.ignite.configuration.CollectionConfiguration;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.lang.IgniteBiPredicate;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
@@ -22,7 +19,6 @@ import org.avaje.ebean.ignite.config.ConfigPair;
 import org.avaje.ebean.ignite.config.ConfigXmlReader;
 import org.avaje.ebean.ignite.config.L2Configuration;
 import org.avaje.ignite.IgniteConfigBuilder;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +30,13 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Factory for creating L2 server caches with Apache Ignite.
  * <p>
- * The L2 Query cache is effectively an always near/no server cache and we
- * use Ignite to send/receive invalidation messages for the query caches.
+ * The L2 Query cache is effectively an always a near cache and we use Ignite to send/receive
+ * invalidation messages for the query caches on all the members of the cluster.
  * </p>
  * <p>
  * All the 'Bean' caches will typically be partitioned with an optional 'near' cache option or replicated.
- * REPLICATED caches would be a good choice for small cardinality/stable bean types (countries, currencies etc).
+ * Replicated caches ought to be a good choice for small cardinality/stable bean types (like countries,
+ * currencies etc).
  * </p>
  */
 public class IgCacheFactory implements ServerCacheFactory {
@@ -48,25 +45,43 @@ public class IgCacheFactory implements ServerCacheFactory {
 
   private static final Logger logger = LoggerFactory.getLogger("org.avaje.ebean.cache.CACHE");
 
-  private static final String QC_CREATE = "L2QueryCacheCreate";
-
   private static final String QC_INVALIDATE = "L2QueryCacheInvalidate";
 
   private final ConcurrentHashMap<String, IgQueryCache> queryCaches;
 
   private final ConfigManager configManager;
 
+  private final BackgroundExecutor executor;
+
   private Ignite ignite;
 
   private IgniteMessaging messaging;
 
-  private IgniteSet<String> queryCacheKeys;
-
-  private SpiServer pluginServer;
-
-  public IgCacheFactory() {
+  public IgCacheFactory(ServerConfig serverConfig, BackgroundExecutor executor) {
+    this.executor = executor;
     this.queryCaches = new ConcurrentHashMap<>();
     this.configManager = new ConfigManager(readConfiguration());
+
+    // programmatically set into ServerConfig - typical DI setup
+    IgniteConfiguration configuration = (IgniteConfiguration) serverConfig.getServiceObject("igniteConfiguration");
+    if (configuration == null) {
+      Properties properties = serverConfig.getProperties();
+      if (properties != null) {
+        configuration = new IgniteConfigBuilder("ignite", properties).build();
+      } else {
+        configuration = new IgniteConfiguration();
+      }
+    }
+
+    if (configuration.getGridLogger() == null) {
+      configuration.setGridLogger(new Slf4jLogger(logger));
+    }
+
+    logger.debug("Starting Ignite");
+    ignite = Ignition.start(configuration);
+
+    messaging = ignite.message(ignite.cluster().forRemotes());
+    messaging.localListen(QC_INVALIDATE, new QueryCacheInvalidateListener());
   }
 
   /**
@@ -94,58 +109,6 @@ public class IgCacheFactory implements ServerCacheFactory {
     return ConfigXmlReader.read("/ebean-ignite-config.xml");
   }
 
-  @Override
-  public void init(EbeanServer ebeanServer) {
-
-    pluginServer = ebeanServer.getPluginApi();
-
-    ServerConfig serverConfig = ebeanServer.getPluginApi().getServerConfig();
-
-    // programmatically set into ServerConfig - typical DI setup
-    IgniteConfiguration configuration = (IgniteConfiguration) serverConfig.getServiceObject("igniteConfiguration");
-    if (configuration == null) {
-
-      Properties properties = serverConfig.getProperties();
-      if (properties != null) {
-        configuration = new IgniteConfigBuilder("ignite", properties).build();
-      } else {
-        configuration = new IgniteConfiguration();
-      }
-    }
-
-    if (configuration.getGridLogger() == null) {
-      configuration.setGridLogger(new Slf4jLogger(logger));
-    }
-
-    logger.debug("Starting Ignite");
-    ignite = Ignition.start(configuration);
-
-    messaging = ignite.message(ignite.cluster().forRemotes());
-    messaging.localListen(QC_INVALIDATE, new QueryCacheInvalidateListener());
-    messaging.localListen(QC_CREATE, new QueryCacheCreatedListener());
-
-    // find all the query caches that have been started and register
-    // them early so that we immediately invalidate as necessary
-    queryCacheKeys = ignite.set("queryCacheNames", new CollectionConfiguration());
-    for (String key : queryCacheKeys) {
-      try {
-        logger.debug("init query cache for {}", key);
-        pluginServer.initQueryCache(key);
-
-      } catch (Exception e) {
-        logger.error("Failed to initiate query cache for " + key, e);
-      }
-    }
-  }
-
-  private class QueryCacheCreatedListener implements IgniteBiPredicate<UUID, String> {
-    @Override
-    public boolean apply(UUID uuid, String key) {
-      queryCacheCreated(key);
-      return true;
-    }
-  }
-
   private class QueryCacheInvalidateListener implements IgniteBiPredicate<UUID, String> {
     @Override
     public boolean apply(UUID uuid, String key) {
@@ -157,9 +120,10 @@ public class IgCacheFactory implements ServerCacheFactory {
   @Override
   public ServerCache createCache(ServerCacheType type, String key, ServerCacheOptions options) {
 
+    logger.debug("create cache - type:{} key:{}", type, key);
     switch (type) {
       case QUERY:
-        return createQueryCache(key);
+        return createQueryCache(key, options);
 
       default:
         return createNormalCache(type, key);
@@ -186,7 +150,6 @@ public class IgCacheFactory implements ServerCacheFactory {
   /**
    * Return the full cache name (JMX safe name).
    */
-  @NotNull
   private String fullName(ServerCacheType type, String key) {
     return type.name() + "-" + key;
   }
@@ -194,13 +157,12 @@ public class IgCacheFactory implements ServerCacheFactory {
   /**
    * Create a local/near query cache.
    */
-  private ServerCache createQueryCache(String key) {
-
+  private ServerCache createQueryCache(String key, ServerCacheOptions options) {
     synchronized (this) {
       IgQueryCache cache = queryCaches.get(key);
       if (cache == null) {
-        sendQueryCacheCreated(key);
-        cache = new IgQueryCache(key, new ServerCacheOptions());
+        cache = new IgQueryCache(key, options);
+        cache.periodicTrim(executor);
         queryCaches.put(key, cache);
       }
       return cache;
@@ -208,9 +170,9 @@ public class IgCacheFactory implements ServerCacheFactory {
   }
 
   /**
-   * Local only implementation with no serialisation requirements..
+   * Local only cache implementation with no serialisation requirements.
    * <p>
-   * Uses topic to invalidate across the cluster.
+   * Uses Ignite topic to invalidate across the cluster.
    * </p>
    */
   private class IgQueryCache extends DefaultServerCache {
@@ -242,14 +204,6 @@ public class IgCacheFactory implements ServerCacheFactory {
   }
 
   /**
-   * Send the query cache created message to all members of the cluster.
-   */
-  private void sendQueryCacheCreated(String key) {
-    queryCacheKeys.add(key);
-    messaging.send(QC_CREATE, key);
-  }
-
-  /**
    * Clear the query cache if we have it.
    */
   private void queryCacheInvalidate(String key) {
@@ -259,14 +213,4 @@ public class IgCacheFactory implements ServerCacheFactory {
     }
   }
 
-  /**
-   * A node in the cluster created this query cache so we need to as well.
-   */
-  private void queryCacheCreated(String key) {
-    IgQueryCache queryCache = queryCaches.get(key);
-    if (queryCache != null) {
-      queryLogger.debug("   cluster creating cache {}", key);
-      pluginServer.initQueryCache(key);
-    }
-  }
 }

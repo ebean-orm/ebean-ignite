@@ -1,11 +1,11 @@
 package org.example.domain;
 
 
-import com.avaje.ebean.annotation.CacheStrategy;
+import com.avaje.ebean.annotation.Cache;
 
 import javax.persistence.Entity;
 
-@CacheStrategy
+@Cache(enableQueryCache = true)
 @Entity
 public class EFoo extends EBase {
 
