@@ -1,6 +1,6 @@
-package org.avaje.ebean.ignite.config;
+package io.ebean.ignite.config;
 
-import com.avaje.ebean.cache.ServerCacheType;
+import io.ebean.cache.ServerCacheType;
 import org.apache.ignite.cache.CacheAtomicWriteOrderMode;
 import org.apache.ignite.cache.CacheMode;
 import org.testng.annotations.Test;

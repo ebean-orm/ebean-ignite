@@ -1,7 +1,7 @@
-package org.avaje.ebean.ignite;
+package io.ebean.ignite;
 
-import com.avaje.ebean.cache.ServerCache;
-import com.avaje.ebean.cache.ServerCacheStatistics;
+import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheStatistics;
 import org.apache.ignite.IgniteCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

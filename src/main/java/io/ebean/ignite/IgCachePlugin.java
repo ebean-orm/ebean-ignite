@@ -1,9 +1,9 @@
-package org.avaje.ebean.ignite;
+package io.ebean.ignite;
 
-import com.avaje.ebean.BackgroundExecutor;
-import com.avaje.ebean.cache.ServerCacheFactory;
-import com.avaje.ebean.cache.ServerCachePlugin;
-import com.avaje.ebean.config.ServerConfig;
+import io.ebean.BackgroundExecutor;
+import io.ebean.cache.ServerCacheFactory;
+import io.ebean.cache.ServerCachePlugin;
+import io.ebean.config.ServerConfig;
 
 /**
  * Cache plugin that creates the Ignite ServerCacheFactory.

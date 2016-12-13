@@ -1,4 +1,4 @@
-package org.avaje.ebean.ignite.config;
+package io.ebean.ignite.config;
 
 import org.testng.annotations.Test;
 

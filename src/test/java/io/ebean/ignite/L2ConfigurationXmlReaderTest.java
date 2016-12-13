@@ -1,7 +1,7 @@
-package org.avaje.ebean.ignite;
+package io.ebean.ignite;
 
-import org.avaje.ebean.ignite.config.L2Configuration;
-import org.avaje.ebean.ignite.config.ConfigXmlReader;
+import io.ebean.ignite.config.L2Configuration;
+import io.ebean.ignite.config.ConfigXmlReader;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;

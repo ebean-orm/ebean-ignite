@@ -1,7 +1,7 @@
 package org.example.domain;
 
 
-import com.avaje.ebean.annotation.Cache;
+import io.ebean.annotation.Cache;
 
 import javax.persistence.Entity;
 

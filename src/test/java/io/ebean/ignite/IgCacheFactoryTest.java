@@ -1,9 +1,9 @@
-package org.avaje.ebean.ignite;
+package io.ebean.ignite;
 
-import com.avaje.ebean.Ebean;
-import com.avaje.ebean.EbeanServer;
-import com.avaje.ebean.cache.ServerCache;
-import com.avaje.ebean.cache.ServerCacheManager;
+import io.ebean.Ebean;
+import io.ebean.EbeanServer;
+import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheManager;
 import main.Server;
 import org.example.domain.EFoo;
 import org.testng.annotations.Test;

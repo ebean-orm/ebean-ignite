@@ -1,5 +1,5 @@
 
-package org.avaje.ebean.ignite.config;
+package io.ebean.ignite.config;
 
 import javax.xml.bind.annotation.XmlRegistry;
 
