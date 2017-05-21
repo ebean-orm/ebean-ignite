@@ -5,6 +5,7 @@ import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheFactory;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
+import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.ServerConfig;
 import io.ebeaninternal.server.cache.DefaultServerCache;
 import org.apache.ignite.Ignite;
@@ -118,19 +119,19 @@ public class IgCacheFactory implements ServerCacheFactory {
   }
 
   @Override
-  public ServerCache createCache(ServerCacheType type, String key, ServerCacheOptions options) {
+  public ServerCache createCache(ServerCacheType type, String key, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
 
     logger.debug("create cache - type:{} key:{}", type, key);
     switch (type) {
       case QUERY:
-        return createQueryCache(key, options);
+        return createQueryCache(key, tenantProvider, options);
 
       default:
-        return createNormalCache(type, key);
+        return createNormalCache(type, tenantProvider, key);
     }
   }
 
-  private ServerCache createNormalCache(ServerCacheType type, String key) {
+  private ServerCache createNormalCache(ServerCacheType type, CurrentTenantProvider tenantProvider, String key) {
 
     ConfigPair pair = configManager.getConfig(type, key);
 
@@ -144,7 +145,7 @@ public class IgCacheFactory implements ServerCacheFactory {
       cache = ignite.getOrCreateCache(pair.getMain());
     }
 
-    return new IgCache(cache);
+    return new IgCache(cache, tenantProvider);
   }
 
   /**
@@ -157,11 +158,11 @@ public class IgCacheFactory implements ServerCacheFactory {
   /**
    * Create a local/near query cache.
    */
-  private ServerCache createQueryCache(String key, ServerCacheOptions options) {
+  private ServerCache createQueryCache(String key, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
     synchronized (this) {
       IgQueryCache cache = queryCaches.get(key);
       if (cache == null) {
-        cache = new IgQueryCache(key, options);
+        cache = new IgQueryCache(key, tenantProvider, options);
         cache.periodicTrim(executor);
         queryCaches.put(key, cache);
       }
@@ -177,8 +178,8 @@ public class IgCacheFactory implements ServerCacheFactory {
    */
   private class IgQueryCache extends DefaultServerCache {
 
-    IgQueryCache(String name, ServerCacheOptions options) {
-      super(name, options);
+    IgQueryCache(String name, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
+      super(name, tenantProvider, options);
     }
 
     @Override

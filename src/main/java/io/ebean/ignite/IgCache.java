@@ -2,6 +2,8 @@ package io.ebean.ignite;
 
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
+import io.ebean.cache.TenantAwareKey;
+import io.ebean.config.CurrentTenantProvider;
 import org.apache.ignite.IgniteCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,15 +17,22 @@ class IgCache implements ServerCache {
 
   private final IgniteCache cache;
 
-  IgCache(IgniteCache cache) {
+  private final TenantAwareKey tenantAwareKey;
+
+  IgCache(IgniteCache cache, CurrentTenantProvider tenantProvider) {
     this.cache = cache;
+    this.tenantAwareKey = new TenantAwareKey(tenantProvider);
+  }
+
+  private Object key(Object key) {
+    return tenantAwareKey.key(key);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public Object get(Object id) {
     try {
-      return cache.get(id);
+      return cache.get(key(id));
     } catch (Exception e) {
       logger.warn("Error calling cache GET. No ignite servers running?", e);
       // treat as miss
@@ -35,7 +44,7 @@ class IgCache implements ServerCache {
   @SuppressWarnings("unchecked")
   public Object put(Object id, Object value) {
     try {
-      cache.put(id, value);
+      cache.put(key(id), value);
     } catch (Exception e) {
       logger.warn("Error calling cache PUT. No ignite servers running?", e);
     }
@@ -47,7 +56,7 @@ class IgCache implements ServerCache {
   @SuppressWarnings("unchecked")
   public Object remove(Object id) {
     try {
-      cache.remove(id);
+      cache.remove(key(id));
     } catch (Exception e) {
       logger.warn("Error calling cache REMOVE. No ignite servers running?", e);
     }
