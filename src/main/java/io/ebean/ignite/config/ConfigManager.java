@@ -1,6 +1,7 @@
 package io.ebean.ignite.config;
 
 import io.ebean.cache.ServerCacheType;
+import java.util.regex.Pattern;
 import org.apache.ignite.cache.eviction.lru.LruEvictionPolicy;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.NearCacheConfiguration;
@@ -16,6 +17,8 @@ import java.util.List;
 public class ConfigManager {
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigManager.class);
+
+  private static final Pattern matchClassesPattern = Pattern.compile("[,;]");
 
   private final L2Configuration configuration;
 
@@ -118,11 +121,11 @@ public class ConfigManager {
   }
 
   private boolean isMatch(String key, String matchClasses) {
-    String[] matches = matchClasses.split("[,;]");
-    for (int i = 0; i < matches.length; i++) {
-      String matcher = matches[i].trim();
+    String[] matches = matchClassesPattern.split(matchClasses, 0);
+    for (String match : matches) {
+      String matcher = match.trim();
       if (!matcher.contains(".")) {
-        matcher = "." + matcher;
+        matcher = '.' + matcher;
         key = key.toLowerCase();
       }
       if (key.contains(matcher)) {

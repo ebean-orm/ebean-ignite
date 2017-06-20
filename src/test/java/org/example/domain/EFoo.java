@@ -30,7 +30,7 @@ public class EFoo extends EBase {
   }
 
   public String toString() {
-    return "[id:"+id+" name:"+name+"]";
+    return "[id:"+id+" name:"+name+ ']';
   }
 
   public Status getStatus() {

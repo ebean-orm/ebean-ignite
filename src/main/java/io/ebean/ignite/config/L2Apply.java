@@ -61,7 +61,7 @@ public class L2Apply {
      */
     public List<L2CacheMatch> getMatch() {
         if (match == null) {
-            match = new ArrayList<L2CacheMatch>();
+            match = new ArrayList<>();
         }
         return this.match;
     }
