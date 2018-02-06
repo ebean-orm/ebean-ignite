@@ -152,7 +152,7 @@ public class IgCacheFactory implements ServerCacheFactory {
    * Return the full cache name (JMX safe name).
    */
   private String fullName(ServerCacheType type, String key) {
-    return type.name() + "-" + key;
+    return type.name() + '-' + key;
   }
 
   /**

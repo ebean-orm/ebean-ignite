@@ -8,8 +8,6 @@ import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
-
 public class Server {
 
   private static final Logger logger = LoggerFactory.getLogger(Server.class);
