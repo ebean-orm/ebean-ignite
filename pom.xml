@@ -10,7 +10,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-ignite</artifactId>
-  <version>10.3.2-SNAPSHOT</version>
+  <version>11.10.1-SNAPSHOT</version>
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean-ignite.git</developerConnection>
@@ -26,7 +26,8 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>[1.7.12,1.7.99)</version>
+      <version>1.7.25</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -50,7 +51,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>10.3.1</version>
+      <version>11.10.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -82,7 +83,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:2.1</tile>
+            <tile>io.ebean.tile:enhancement:5.2</tile>
           </tiles>
         </configuration>
       </plugin>

@@ -8,6 +8,10 @@ import org.apache.ignite.IgniteCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
 /**
  * IgniteCache adaptor to ServerCache
  */
@@ -28,7 +32,40 @@ class IgCache implements ServerCache {
     return tenantAwareKey.key(key);
   }
 
-  @Override
+	@Override
+	@SuppressWarnings("unchecked")
+	public Map<Object, Object> getAll(Set<Object> keys) {
+  	try {
+			return cache.getAll(keys);
+	  } catch (Exception e) {
+		  logger.warn("Error calling cache GET. No ignite servers running?", e);
+		  // treat as miss
+		  return Collections.EMPTY_MAP;
+	  }
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void putAll(Map<Object, Object> keyValues) {
+		try {
+			cache.putAll(keyValues);
+		} catch (Exception e) {
+			logger.warn("Error calling cache GET. No ignite servers running?", e);
+
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void removeAll(Set<Object> keys) {
+		try {
+			cache.removeAll(keys);
+		} catch (Exception e) {
+			logger.warn("Error calling cache GET. No ignite servers running?", e);
+		}
+	}
+
+	@Override
   @SuppressWarnings("unchecked")
   public Object get(Object id) {
     try {
@@ -42,26 +79,22 @@ class IgCache implements ServerCache {
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object put(Object id, Object value) {
+  public void put(Object id, Object value) {
     try {
       cache.put(key(id), value);
     } catch (Exception e) {
       logger.warn("Error calling cache PUT. No ignite servers running?", e);
     }
-    // return null but that is fine, we don't need it
-    return null;
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object remove(Object id) {
+  public void remove(Object id) {
     try {
       cache.remove(key(id));
     } catch (Exception e) {
       logger.warn("Error calling cache REMOVE. No ignite servers running?", e);
     }
-    // return null but that is fine, we don't need it
-    return null;
   }
 
   @Override

@@ -47,12 +47,12 @@ public class IgCacheFactoryTest {
     EFoo fetch1 = Ebean.find(EFoo.class)
         .setId(foo.getId())
         .select("name, status, notes, version")
-        .findUnique();
+        .findOne();
 
     EFoo fetch2 = Ebean.find(EFoo.class)
         .setId(foo.getId())
         .select("name, status, notes, version")
-        .findUnique();
+        .findOne();
 
     assertNotNull(fetch1);
     assertNotNull(fetch2);
@@ -67,7 +67,7 @@ public class IgCacheFactoryTest {
     EFoo fetch3 = Ebean.find(EFoo.class)
         .setId(foo.getId())
         .select("name, status, notes, version")
-        .findUnique();
+        .findOne();
 
     assertNotNull(fetch3);
     assertEquals(fetch3.getNotes(), "ModNotes");
