@@ -1,11 +1,12 @@
 package io.ebean.ignite.config;
 
 import io.ebean.cache.ServerCacheType;
-import org.apache.ignite.cache.CacheAtomicWriteOrderMode;
 import org.apache.ignite.cache.CacheMode;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ConfigManagerTest {
 
@@ -17,7 +18,7 @@ public class ConfigManagerTest {
   }
 
   @Test
-  public void getConfig_country() throws Exception {
+  public void getConfig_country() {
 
     ConfigPair countryPair = manager.getConfig(ServerCacheType.BEAN, "org.example.domain.Country");
 
@@ -26,14 +27,12 @@ public class ConfigManagerTest {
   }
 
   @Test
-  public void getConfig_customer() throws Exception {
+  public void getConfig_customer() {
 
     ConfigPair pair = manager.getConfig(ServerCacheType.BEAN, "org.example.domain.Customer");
 
     assertEquals(pair.getMain().getCacheMode(), CacheMode.PARTITIONED);
     assertNotNull(pair.getNear());
-    assertEquals(pair.getMain().getAtomicWriteOrderMode(), CacheAtomicWriteOrderMode.CLOCK);
-
   }
 
 }

@@ -1,9 +1,7 @@
 
 package io.ebean.ignite.config;
 
-import org.apache.ignite.cache.CacheAtomicWriteOrderMode;
 import org.apache.ignite.cache.CacheAtomicityMode;
-import org.apache.ignite.cache.CacheMemoryMode;
 import org.apache.ignite.cache.CacheMode;
 import org.apache.ignite.cache.CacheRebalanceMode;
 import org.apache.ignite.cache.CacheWriteSynchronizationMode;
@@ -13,12 +11,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
  * <p>Java class for l2CacheConfig complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="l2CacheConfig">
  *   &lt;complexContent>
@@ -69,8 +66,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "l2CacheConfig", propOrder = {
@@ -78,8 +75,6 @@ import javax.xml.bind.annotation.XmlType;
 })
 public class L2CacheConfig {
 
-    @XmlSchemaType(name = "string")
-    protected CacheAtomicWriteOrderMode atomicWriteOrderMode;
     @XmlSchemaType(name = "string")
     protected CacheAtomicityMode atomicityMode;
     protected Integer backups;
@@ -97,8 +92,6 @@ public class L2CacheConfig {
     protected Boolean loadPrevVal;
     protected Long longQryWarnTimeout;
     protected Integer maxConcurrentAsyncOps;
-    @XmlSchemaType(name = "string")
-    protected CacheMemoryMode memMode;
     protected String name;
     protected Integer nearSize;
     protected Long offHeapMaxMem;
@@ -126,36 +119,12 @@ public class L2CacheConfig {
     protected CacheWriteSynchronizationMode writeSync;
 
     /**
-     * Gets the value of the atomicWriteOrderMode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CacheAtomicWriteOrderMode }
-     *     
-     */
-    public CacheAtomicWriteOrderMode getAtomicWriteOrderMode() {
-        return atomicWriteOrderMode;
-    }
-
-    /**
-     * Sets the value of the atomicWriteOrderMode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CacheAtomicWriteOrderMode }
-     *     
-     */
-    public void setAtomicWriteOrderMode(CacheAtomicWriteOrderMode value) {
-        this.atomicWriteOrderMode = value;
-    }
-
-    /**
      * Gets the value of the atomicityMode property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link CacheAtomicityMode }
-     *     
+     *
      */
     public CacheAtomicityMode getAtomicityMode() {
         return atomicityMode;
@@ -163,11 +132,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the atomicityMode property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link CacheAtomicityMode }
-     *     
+     *
      */
     public void setAtomicityMode(CacheAtomicityMode value) {
         this.atomicityMode = value;
@@ -175,11 +144,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the backups property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getBackups() {
         return backups;
@@ -187,11 +156,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the backups property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setBackups(Integer value) {
         this.backups = value;
@@ -199,11 +168,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the cacheMode property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link CacheMode }
-     *     
+     *
      */
     public CacheMode getCacheMode() {
         return cacheMode;
@@ -211,11 +180,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the cacheMode property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link CacheMode }
-     *     
+     *
      */
     public void setCacheMode(CacheMode value) {
         this.cacheMode = value;
@@ -223,11 +192,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the cpOnRead property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isCpOnRead() {
         return cpOnRead;
@@ -235,11 +204,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the cpOnRead property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setCpOnRead(Boolean value) {
         this.cpOnRead = value;
@@ -247,11 +216,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the dfltLockTimeout property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getDfltLockTimeout() {
         return dfltLockTimeout;
@@ -259,11 +228,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the dfltLockTimeout property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setDfltLockTimeout(Long value) {
         this.dfltLockTimeout = value;
@@ -271,11 +240,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the eagerTtl property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isEagerTtl() {
         return eagerTtl;
@@ -283,11 +252,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the eagerTtl property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setEagerTtl(Boolean value) {
         this.eagerTtl = value;
@@ -295,11 +264,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the evictKeyBufSize property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getEvictKeyBufSize() {
         return evictKeyBufSize;
@@ -307,11 +276,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the evictKeyBufSize property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setEvictKeyBufSize(Integer value) {
         this.evictKeyBufSize = value;
@@ -319,11 +288,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the evictMaxOverflowRatio property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Float }
-     *     
+     *
      */
     public Float getEvictMaxOverflowRatio() {
         return evictMaxOverflowRatio;
@@ -331,11 +300,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the evictMaxOverflowRatio property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Float }
-     *     
+     *
      */
     public void setEvictMaxOverflowRatio(Float value) {
         this.evictMaxOverflowRatio = value;
@@ -343,11 +312,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the evictSync property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isEvictSync() {
         return evictSync;
@@ -355,11 +324,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the evictSync property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setEvictSync(Boolean value) {
         this.evictSync = value;
@@ -367,11 +336,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the evictSyncConcurrencyLvl property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getEvictSyncConcurrencyLvl() {
         return evictSyncConcurrencyLvl;
@@ -379,11 +348,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the evictSyncConcurrencyLvl property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setEvictSyncConcurrencyLvl(Integer value) {
         this.evictSyncConcurrencyLvl = value;
@@ -391,11 +360,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the evictSyncTimeout property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getEvictSyncTimeout() {
         return evictSyncTimeout;
@@ -403,11 +372,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the evictSyncTimeout property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setEvictSyncTimeout(Long value) {
         this.evictSyncTimeout = value;
@@ -415,11 +384,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the invalidate property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isInvalidate() {
         return invalidate;
@@ -427,11 +396,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the invalidate property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setInvalidate(Boolean value) {
         this.invalidate = value;
@@ -439,11 +408,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the loadPrevVal property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isLoadPrevVal() {
         return loadPrevVal;
@@ -451,11 +420,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the loadPrevVal property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setLoadPrevVal(Boolean value) {
         this.loadPrevVal = value;
@@ -463,11 +432,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the longQryWarnTimeout property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getLongQryWarnTimeout() {
         return longQryWarnTimeout;
@@ -475,11 +444,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the longQryWarnTimeout property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setLongQryWarnTimeout(Long value) {
         this.longQryWarnTimeout = value;
@@ -487,11 +456,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the maxConcurrentAsyncOps property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getMaxConcurrentAsyncOps() {
         return maxConcurrentAsyncOps;
@@ -499,47 +468,23 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the maxConcurrentAsyncOps property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setMaxConcurrentAsyncOps(Integer value) {
         this.maxConcurrentAsyncOps = value;
     }
 
     /**
-     * Gets the value of the memMode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link CacheMemoryMode }
-     *     
-     */
-    public CacheMemoryMode getMemMode() {
-        return memMode;
-    }
-
-    /**
-     * Sets the value of the memMode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link CacheMemoryMode }
-     *     
-     */
-    public void setMemMode(CacheMemoryMode value) {
-        this.memMode = value;
-    }
-
-    /**
      * Gets the value of the name property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getName() {
         return name;
@@ -547,11 +492,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the name property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setName(String value) {
         this.name = value;
@@ -559,11 +504,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the nearSize property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getNearSize() {
         return nearSize;
@@ -571,11 +516,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the nearSize property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setNearSize(Integer value) {
         this.nearSize = value;
@@ -583,11 +528,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the offHeapMaxMem property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getOffHeapMaxMem() {
         return offHeapMaxMem;
@@ -595,11 +540,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the offHeapMaxMem property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setOffHeapMaxMem(Long value) {
         this.offHeapMaxMem = value;
@@ -607,11 +552,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the readFromBackup property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isReadFromBackup() {
         return readFromBackup;
@@ -619,11 +564,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the readFromBackup property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setReadFromBackup(Boolean value) {
         this.readFromBackup = value;
@@ -631,11 +576,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the rebalanceBatchSize property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getRebalanceBatchSize() {
         return rebalanceBatchSize;
@@ -643,11 +588,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the rebalanceBatchSize property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setRebalanceBatchSize(Integer value) {
         this.rebalanceBatchSize = value;
@@ -655,11 +600,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the rebalanceBatchesPrefetchCount property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getRebalanceBatchesPrefetchCount() {
         return rebalanceBatchesPrefetchCount;
@@ -667,11 +612,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the rebalanceBatchesPrefetchCount property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setRebalanceBatchesPrefetchCount(Long value) {
         this.rebalanceBatchesPrefetchCount = value;
@@ -679,11 +624,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the rebalanceDelay property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getRebalanceDelay() {
         return rebalanceDelay;
@@ -691,11 +636,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the rebalanceDelay property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setRebalanceDelay(Long value) {
         this.rebalanceDelay = value;
@@ -703,11 +648,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the rebalanceMode property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link CacheRebalanceMode }
-     *     
+     *
      */
     public CacheRebalanceMode getRebalanceMode() {
         return rebalanceMode;
@@ -715,11 +660,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the rebalanceMode property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link CacheRebalanceMode }
-     *     
+     *
      */
     public void setRebalanceMode(CacheRebalanceMode value) {
         this.rebalanceMode = value;
@@ -727,11 +672,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the rebalanceOrder property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getRebalanceOrder() {
         return rebalanceOrder;
@@ -739,11 +684,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the rebalanceOrder property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setRebalanceOrder(Integer value) {
         this.rebalanceOrder = value;
@@ -751,11 +696,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the rebalanceThrottle property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getRebalanceThrottle() {
         return rebalanceThrottle;
@@ -763,11 +708,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the rebalanceThrottle property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setRebalanceThrottle(Long value) {
         this.rebalanceThrottle = value;
@@ -775,11 +720,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the rebalanceTimeout property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getRebalanceTimeout() {
         return rebalanceTimeout;
@@ -787,11 +732,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the rebalanceTimeout property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setRebalanceTimeout(Long value) {
         this.rebalanceTimeout = value;
@@ -799,11 +744,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the snapshotableIdx property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isSnapshotableIdx() {
         return snapshotableIdx;
@@ -811,11 +756,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the snapshotableIdx property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setSnapshotableIdx(Boolean value) {
         this.snapshotableIdx = value;
@@ -823,11 +768,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the startSize property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getStartSize() {
         return startSize;
@@ -835,11 +780,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the startSize property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setStartSize(Integer value) {
         this.startSize = value;
@@ -847,11 +792,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the storeConcurrentLoadAllThreshold property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getStoreConcurrentLoadAllThreshold() {
         return storeConcurrentLoadAllThreshold;
@@ -859,11 +804,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the storeConcurrentLoadAllThreshold property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setStoreConcurrentLoadAllThreshold(Integer value) {
         this.storeConcurrentLoadAllThreshold = value;
@@ -871,11 +816,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the storeKeepBinary property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isStoreKeepBinary() {
         return storeKeepBinary;
@@ -883,11 +828,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the storeKeepBinary property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setStoreKeepBinary(Boolean value) {
         this.storeKeepBinary = value;
@@ -895,11 +840,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the swapEnabled property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isSwapEnabled() {
         return swapEnabled;
@@ -907,11 +852,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the swapEnabled property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setSwapEnabled(Boolean value) {
         this.swapEnabled = value;
@@ -919,11 +864,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the tmLookupClsName property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getTmLookupClsName() {
         return tmLookupClsName;
@@ -931,11 +876,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the tmLookupClsName property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setTmLookupClsName(String value) {
         this.tmLookupClsName = value;
@@ -943,11 +888,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the writeBehindBatchSize property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getWriteBehindBatchSize() {
         return writeBehindBatchSize;
@@ -955,11 +900,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the writeBehindBatchSize property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setWriteBehindBatchSize(Integer value) {
         this.writeBehindBatchSize = value;
@@ -967,11 +912,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the writeBehindEnabled property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public Boolean isWriteBehindEnabled() {
         return writeBehindEnabled;
@@ -979,11 +924,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the writeBehindEnabled property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setWriteBehindEnabled(Boolean value) {
         this.writeBehindEnabled = value;
@@ -991,11 +936,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the writeBehindFlushFreq property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Long }
-     *     
+     *
      */
     public Long getWriteBehindFlushFreq() {
         return writeBehindFlushFreq;
@@ -1003,11 +948,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the writeBehindFlushFreq property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Long }
-     *     
+     *
      */
     public void setWriteBehindFlushFreq(Long value) {
         this.writeBehindFlushFreq = value;
@@ -1015,11 +960,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the writeBehindFlushSize property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getWriteBehindFlushSize() {
         return writeBehindFlushSize;
@@ -1027,11 +972,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the writeBehindFlushSize property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setWriteBehindFlushSize(Integer value) {
         this.writeBehindFlushSize = value;
@@ -1039,11 +984,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the writeBehindFlushThreadCnt property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public Integer getWriteBehindFlushThreadCnt() {
         return writeBehindFlushThreadCnt;
@@ -1051,11 +996,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the writeBehindFlushThreadCnt property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setWriteBehindFlushThreadCnt(Integer value) {
         this.writeBehindFlushThreadCnt = value;
@@ -1063,11 +1008,11 @@ public class L2CacheConfig {
 
     /**
      * Gets the value of the writeSync property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link CacheWriteSynchronizationMode }
-     *     
+     *
      */
     public CacheWriteSynchronizationMode getWriteSync() {
         return writeSync;
@@ -1075,11 +1020,11 @@ public class L2CacheConfig {
 
     /**
      * Sets the value of the writeSync property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link CacheWriteSynchronizationMode }
-     *     
+     *
      */
     public void setWriteSync(CacheWriteSynchronizationMode value) {
         this.writeSync = value;

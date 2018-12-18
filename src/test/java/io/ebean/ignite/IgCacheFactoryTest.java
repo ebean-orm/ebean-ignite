@@ -2,27 +2,41 @@ package io.ebean.ignite;
 
 import io.ebean.Ebean;
 import io.ebean.EbeanServer;
+import io.ebean.EbeanServerFactory;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
+import io.ebean.config.ServerConfig;
 import main.Server;
+import org.apache.ignite.configuration.IgniteConfiguration;
+import org.apache.ignite.logger.slf4j.Slf4jLogger;
 import org.example.domain.EFoo;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 
 public class IgCacheFactoryTest {
 
-  private final EbeanServer server;
+  private static EbeanServer server;
 
-  Server igniteServer;
+  private static Server igniteServer;
 
-  public IgCacheFactoryTest() {
+  static {
     igniteServer = new Server("testServer");
-    server = Ebean.getDefaultServer();
+
+    IgniteConfiguration igniteConfiguration = new IgniteConfiguration();
+    igniteConfiguration.setGridLogger(new Slf4jLogger());
+
+    ServerConfig serverConfig = new ServerConfig();
+    serverConfig.loadFromProperties();
+
+    serverConfig.putServiceObject("igniteConfiguration", igniteConfiguration);
+
+    server = EbeanServerFactory.create(serverConfig);
   }
+
 
   @Test
   public void integration() {
@@ -38,7 +52,7 @@ public class IgCacheFactoryTest {
     System.out.println("f" + fetch1);
   }
 
-  @Test(dependsOnMethods = "integration")
+  @Test
   public void putGet() throws InterruptedException {
 
     EFoo foo = new EFoo("hello");

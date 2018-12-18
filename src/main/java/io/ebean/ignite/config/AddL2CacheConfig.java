@@ -25,9 +25,6 @@ class AddL2CacheConfig {
     if (from.atomicityMode != null) {
       to.atomicityMode = from.atomicityMode;
     }
-    if (from.atomicWriteOrderMode != null) {
-      to.atomicWriteOrderMode = from.atomicWriteOrderMode;
-    }
     if (from.backups != null) {
       to.backups = from.backups;
     }
@@ -69,9 +66,6 @@ class AddL2CacheConfig {
     }
     if (from.maxConcurrentAsyncOps != null) {
       to.maxConcurrentAsyncOps = from.maxConcurrentAsyncOps;
-    }
-    if (from.memMode != null) {
-      to.memMode = from.memMode;
     }
     if (from.name != null) {
       to.name = from.name;
@@ -143,9 +137,6 @@ class AddL2CacheConfig {
     if (from.atomicityMode != null) {
       to.setAtomicityMode(from.atomicityMode);
     }
-    if (from.atomicWriteOrderMode != null) {
-      to.setAtomicWriteOrderMode(from.atomicWriteOrderMode);
-    }
     if (from.backups != null) {
       to.setBackups(from.backups);
     }
@@ -161,41 +152,17 @@ class AddL2CacheConfig {
     if (from.eagerTtl != null) {
       to.setEagerTtl(from.eagerTtl);
     }
-    if (from.evictSync != null) {
-      to.setEvictSynchronized(from.evictSync);
-    }
-    if (from.evictKeyBufSize != null) {
-      to.setEvictSynchronizedKeyBufferSize(from.evictKeyBufSize);
-    }
-    if (from.evictMaxOverflowRatio != null) {
-      to.setEvictMaxOverflowRatio(from.evictMaxOverflowRatio);
-    }
-    if (from.evictSyncConcurrencyLvl != null) {
-      to.setEvictSynchronizedConcurrencyLevel(from.evictSyncConcurrencyLvl);
-    }
-    if (from.evictSyncTimeout != null) {
-      to.setEvictSynchronizedTimeout(from.evictSyncTimeout);
-    }
     if (from.invalidate != null) {
       to.setInvalidate(from.invalidate);
     }
     if (from.loadPrevVal != null) {
       to.setLoadPreviousValue(from.loadPrevVal);
     }
-    if (from.longQryWarnTimeout != null) {
-      to.setLongQueryWarningTimeout(from.longQryWarnTimeout);
-    }
     if (from.maxConcurrentAsyncOps != null) {
       to.setMaxConcurrentAsyncOperations(from.maxConcurrentAsyncOps);
     }
-    if (from.memMode != null) {
-      to.setMemoryMode(from.memMode);
-    }
     if (from.name != null) {
       to.setName(from.name);
-    }
-    if (from.offHeapMaxMem != null) {
-      to.setOffHeapMaxMemory(from.offHeapMaxMem);
     }
     if (from.readFromBackup != null) {
       to.setReadFromBackup(from.readFromBackup);
@@ -221,18 +188,9 @@ class AddL2CacheConfig {
     if (from.rebalanceTimeout != null) {
       to.setRebalanceTimeout(from.rebalanceTimeout);
     }
-    if (from.snapshotableIdx != null) {
-      to.setSnapshotableIndex(from.snapshotableIdx);
-    }
     if (from.storeKeepBinary != null) {
       to.setStoreKeepBinary(from.storeKeepBinary);
     }
-    if (from.swapEnabled != null) {
-      to.setSwapEnabled(from.swapEnabled);
-    }
-//    if (from.tmLookupClsName != null) {
-//      to.setTransactionManagerLookupClassName(from.tmLookupClsName);
-//    }
     if (from.writeBehindEnabled != null) {
       to.setWriteBehindEnabled(from.writeBehindEnabled);
     }

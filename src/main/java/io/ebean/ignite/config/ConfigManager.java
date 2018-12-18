@@ -1,8 +1,7 @@
 package io.ebean.ignite.config;
 
 import io.ebean.cache.ServerCacheType;
-import java.util.regex.Pattern;
-import org.apache.ignite.cache.eviction.lru.LruEvictionPolicy;
+import org.apache.ignite.cache.eviction.lru.LruEvictionPolicyFactory;
 import org.apache.ignite.configuration.CacheConfiguration;
 import org.apache.ignite.configuration.NearCacheConfiguration;
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Determines the cache configuration that should be applied to any given L2 cache.
@@ -95,7 +95,7 @@ public class ConfigManager {
 
     } else {
       NearCacheConfiguration near = new NearCacheConfiguration();
-      near.setNearEvictionPolicy(new LruEvictionPolicy(config.getNearSize()));
+      near.setNearEvictionPolicyFactory(new LruEvictionPolicyFactory(config.getNearSize()));
       return  near;
     }
   }

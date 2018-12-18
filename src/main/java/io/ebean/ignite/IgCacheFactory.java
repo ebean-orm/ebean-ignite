@@ -2,12 +2,18 @@ package io.ebean.ignite;
 
 import io.ebean.BackgroundExecutor;
 import io.ebean.cache.ServerCache;
+import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheOptions;
+import io.ebean.cache.ServerCacheNotification;
+import io.ebean.cache.ServerCacheNotify;
 import io.ebean.cache.ServerCacheType;
-import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.ServerConfig;
-import io.ebeaninternal.server.cache.DefaultServerCache;
+import io.ebean.ignite.config.ConfigManager;
+import io.ebean.ignite.config.ConfigPair;
+import io.ebean.ignite.config.ConfigXmlReader;
+import io.ebean.ignite.config.L2Configuration;
+import io.ebeaninternal.server.cache.DefaultServerCacheConfig;
+import io.ebeaninternal.server.cache.DefaultServerQueryCache;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteMessaging;
@@ -15,18 +21,18 @@ import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.lang.IgniteBiPredicate;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
-import io.ebean.ignite.config.ConfigManager;
-import io.ebean.ignite.config.ConfigPair;
-import io.ebean.ignite.config.ConfigXmlReader;
-import io.ebean.ignite.config.L2Configuration;
-import org.avaje.ignite.IgniteConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+//import org.avaje.ignite.IgniteConfigBuilder;
 
 /**
  * Factory for creating L2 server caches with Apache Ignite.
@@ -46,13 +52,19 @@ public class IgCacheFactory implements ServerCacheFactory {
 
   private static final Logger logger = LoggerFactory.getLogger("org.avaje.ebean.cache.CACHE");
 
+  private static final Logger tableModLogger = LoggerFactory.getLogger("io.ebean.cache.TABLEMODS");
+
   private static final String QC_INVALIDATE = "L2QueryCacheInvalidate";
+
+  private static final String TABLE_MOD = "L2TableMod";
 
   private final ConcurrentHashMap<String, IgQueryCache> queryCaches;
 
   private final ConfigManager configManager;
 
   private final BackgroundExecutor executor;
+
+  private ServerCacheNotify listener;
 
   private Ignite ignite;
 
@@ -67,11 +79,11 @@ public class IgCacheFactory implements ServerCacheFactory {
     IgniteConfiguration configuration = (IgniteConfiguration) serverConfig.getServiceObject("igniteConfiguration");
     if (configuration == null) {
       Properties properties = serverConfig.getProperties();
-      if (properties != null) {
-        configuration = new IgniteConfigBuilder("ignite", properties).build();
-      } else {
+//      if (properties != null) {
+//        configuration = new IgniteConfigBuilder("ignite", properties).build();
+//      } else {
         configuration = new IgniteConfiguration();
-      }
+//      }
     }
 
     if (configuration.getGridLogger() == null) {
@@ -83,6 +95,13 @@ public class IgCacheFactory implements ServerCacheFactory {
 
     messaging = ignite.message(ignite.cluster().forRemotes());
     messaging.localListen(QC_INVALIDATE, new QueryCacheInvalidateListener());
+    messaging.localListen(TABLE_MOD, new TableModListener());
+  }
+
+  @Override
+  public ServerCacheNotify createCacheNotify(ServerCacheNotify listener) {
+    this.listener = listener;
+    return new IgServerCacheNotify();
   }
 
   /**
@@ -118,24 +137,30 @@ public class IgCacheFactory implements ServerCacheFactory {
     }
   }
 
-  @Override
-  public ServerCache createCache(ServerCacheType type, String key, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
-
-    logger.debug("create cache - type:{} key:{}", type, key);
-    switch (type) {
-      case QUERY:
-        return createQueryCache(key, tenantProvider, options);
-
-      default:
-        return createNormalCache(type, tenantProvider, key);
+  private class TableModListener implements IgniteBiPredicate<UUID, String> {
+    @Override
+    public boolean apply(UUID uuid, String rawMessage) {
+      processTableNotify(rawMessage);
+      return true;
     }
   }
 
-  private ServerCache createNormalCache(ServerCacheType type, CurrentTenantProvider tenantProvider, String key) {
+  @Override
+  public ServerCache createCache(ServerCacheConfig config) {
 
-    ConfigPair pair = configManager.getConfig(type, key);
+    if (config.isQueryCache()) {
+      return createQueryCache(config);
+    }
+    return createNormalCache(config);
+  }
 
-    pair.setName(fullName(type, key));
+  private ServerCache createNormalCache(ServerCacheConfig config) {
+
+    ConfigPair pair = configManager.getConfig(config.getType(), config.getCacheKey());
+
+    String fullName = fullName(config.getType(), config.getCacheKey());
+    logger.debug("create cache - fullName:{}", fullName);
+    pair.setName(fullName);
 
     IgniteCache cache;
     if (pair.hasNearCache()) {
@@ -145,7 +170,7 @@ public class IgCacheFactory implements ServerCacheFactory {
       cache = ignite.getOrCreateCache(pair.getMain());
     }
 
-    return new IgCache(cache, tenantProvider);
+    return new IgCache(cache, config.getTenantProvider());
   }
 
   /**
@@ -158,13 +183,14 @@ public class IgCacheFactory implements ServerCacheFactory {
   /**
    * Create a local/near query cache.
    */
-  private ServerCache createQueryCache(String key, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
+  private ServerCache createQueryCache(ServerCacheConfig config) {
     synchronized (this) {
-      IgQueryCache cache = queryCaches.get(key);
+      IgQueryCache cache = queryCaches.get(config.getCacheKey());
       if (cache == null) {
-        cache = new IgQueryCache(key, tenantProvider, options);
+        logger.debug("create query cache [{}]", config.getCacheKey());
+        cache = new IgQueryCache(new DefaultServerCacheConfig(config));
         cache.periodicTrim(executor);
-        queryCaches.put(key, cache);
+        queryCaches.put(config.getCacheKey(), cache);
       }
       return cache;
     }
@@ -176,10 +202,10 @@ public class IgCacheFactory implements ServerCacheFactory {
    * Uses Ignite topic to invalidate across the cluster.
    * </p>
    */
-  private class IgQueryCache extends DefaultServerCache {
+  private class IgQueryCache extends DefaultServerQueryCache {
 
-    IgQueryCache(String name, CurrentTenantProvider tenantProvider, ServerCacheOptions options) {
-      super(name, tenantProvider, options);
+    IgQueryCache(DefaultServerCacheConfig config) {
+      super(config);
     }
 
     @Override
@@ -211,6 +237,59 @@ public class IgCacheFactory implements ServerCacheFactory {
     IgQueryCache queryCache = queryCaches.get(key);
     if (queryCache != null) {
       queryCache.invalidate();
+    }
+  }
+
+  /**
+   * Process a remote dependent table modify event.
+   */
+  private void processTableNotify(String rawMessage) {
+
+    if (logger.isDebugEnabled()) {
+      logger.debug("processTableNotify {}", rawMessage);
+    }
+
+    String[] split = rawMessage.split(",");
+    long modTimestamp = Long.parseLong(split[0]);
+
+    Set<String> tables = new HashSet<>();
+    tables.addAll(Arrays.asList(split).subList(1, split.length));
+
+    listener.notify(new ServerCacheNotification(modTimestamp, tables));
+  }
+
+  /**
+   * Send the invalidation message to all members of the cluster.
+   */
+  private void sendTableMod(String key) {
+    messaging.send(TABLE_MOD, key);
+  }
+
+  /**
+   * Send the table modifications via Hazelcast topic.
+   */
+  class IgServerCacheNotify implements ServerCacheNotify {
+
+
+    @Override
+    public void notify(ServerCacheNotification tableModifications) {
+
+      Set<String> dependentTables = tableModifications.getDependentTables();
+      if (dependentTables != null && !dependentTables.isEmpty()) {
+
+        StringBuilder msg = new StringBuilder(50);
+        msg.append(tableModifications.getModifyTimestamp()).append(",");
+
+        for (String table : dependentTables) {
+          msg.append(table).append(",");
+        }
+
+        String formattedMsg = msg.toString();
+        if (tableModLogger.isDebugEnabled()) {
+          tableModLogger.debug("Publish TableMods - {}", formattedMsg);
+        }
+        sendTableMod(formattedMsg);
+      }
     }
   }
 

@@ -29,7 +29,7 @@ public class Server {
     IgniteConfiguration configuration = new IgniteConfiguration();
     configuration.setClientMode(false);
     //configuration.setConsistentId("42");
-    configuration.setGridName(theName);
+    configuration.setIgniteInstanceName(theName);
     configuration.setGridLogger(gridLog);
 
     ignite = Ignition.start(configuration);
