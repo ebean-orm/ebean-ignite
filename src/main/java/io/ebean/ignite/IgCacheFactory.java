@@ -250,12 +250,8 @@ public class IgCacheFactory implements ServerCacheFactory {
     }
 
     String[] split = rawMessage.split(",");
-    long modTimestamp = Long.parseLong(split[0]);
-
-    Set<String> tables = new HashSet<>();
-    tables.addAll(Arrays.asList(split).subList(1, split.length));
-
-    listener.notify(new ServerCacheNotification(modTimestamp, tables));
+    Set<String> tables = new HashSet<>(Arrays.asList(split));
+    listener.notify(new ServerCacheNotification(tables));
   }
 
   /**
@@ -278,8 +274,6 @@ public class IgCacheFactory implements ServerCacheFactory {
       if (dependentTables != null && !dependentTables.isEmpty()) {
 
         StringBuilder msg = new StringBuilder(50);
-        msg.append(tableModifications.getModifyTimestamp()).append(",");
-
         for (String table : dependentTables) {
           msg.append(table).append(",");
         }

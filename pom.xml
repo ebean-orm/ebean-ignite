@@ -10,7 +10,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-ignite</artifactId>
-  <version>11.18.2-SNAPSHOT</version>
+  <version>11.39.1-SNAPSHOT</version>
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean-ignite.git</developerConnection>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>11.28.1</version>
+      <version>11.39.1</version>
       <scope>provided</scope>
     </dependency>
 
@@ -84,7 +84,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:7.1</tile>
+            <tile>io.ebean.tile:enhancement:11.39.1</tile>
           </tiles>
         </configuration>
       </plugin>
