@@ -8,12 +8,13 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Version;
 import java.sql.Timestamp;
+import java.util.UUID;
 
 @MappedSuperclass
 public class EBase extends Model {
 
   @Id
-  protected Long id;
+  protected UUID id;
 
   @Version
   protected Long version;
@@ -24,11 +25,11 @@ public class EBase extends Model {
   @WhenModified
   protected Timestamp whenModified;
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

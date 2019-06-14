@@ -41,15 +41,19 @@ public class IgCacheFactoryTest {
   @Test
   public void integration() {
 
-
     ServerCacheManager cacheManager = server.getServerCacheManager();
     ServerCache beanCache = cacheManager.getBeanCache(EFoo.class);
 
     assertThat(beanCache).isInstanceOf(IgCache.class);
 
-    EFoo fetch1 = Ebean.find(EFoo.class, 1);
+    EFoo foo = new EFoo("bar");
+    foo.save();
 
+    EFoo fetch1 = Ebean.find(EFoo.class, foo.getId());
     System.out.println("f" + fetch1);
+
+    EFoo fetch2 = Ebean.find(EFoo.class, foo.getId());
+    System.out.println("f" + fetch2);
   }
 
   @Test
