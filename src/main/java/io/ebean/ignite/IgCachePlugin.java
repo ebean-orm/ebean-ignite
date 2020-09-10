@@ -15,6 +15,6 @@ public class IgCachePlugin implements ServerCachePlugin {
    */
   @Override
   public ServerCacheFactory create(ServerConfig config, BackgroundExecutor executor) {
-    return new IgCacheFactory(config, executor);
+    return IgCacheFactory.create(config, executor);
   }
 }

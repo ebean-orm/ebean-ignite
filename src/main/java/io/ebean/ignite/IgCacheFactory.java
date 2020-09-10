@@ -46,35 +46,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * currencies etc).
  * </p>
  */
-public class IgCacheFactory implements ServerCacheFactory {
-
-  private static final Logger queryLogger = LoggerFactory.getLogger("org.avaje.ebean.cache.QUERY");
-
-  private static final Logger logger = LoggerFactory.getLogger("org.avaje.ebean.cache.CACHE");
-
-  private static final Logger tableModLogger = LoggerFactory.getLogger("io.ebean.cache.TABLEMODS");
-
-  private static final String QC_INVALIDATE = "L2QueryCacheInvalidate";
-
-  private static final String TABLE_MOD = "L2TableMod";
-
-  private final ConcurrentHashMap<String, IgQueryCache> queryCaches;
-
+public class IgCacheFactory extends IgCacheFactoryBase {
   private final ConfigManager configManager;
 
-  private final BackgroundExecutor executor;
-
-  private ServerCacheNotify listener;
-
-  private Ignite ignite;
-
-  private IgniteMessaging messaging;
-
-  public IgCacheFactory(ServerConfig serverConfig, BackgroundExecutor executor) {
-    this.executor = executor;
-    this.queryCaches = new ConcurrentHashMap<>();
-    this.configManager = new ConfigManager(readConfiguration());
-
+  private static Ignite startIgnite(ServerConfig serverConfig, ConfigManager configManager) {
     // programmatically set into ServerConfig - typical DI setup
     IgniteConfiguration configuration = (IgniteConfiguration) serverConfig.getServiceObject("igniteConfiguration");
     if (configuration == null) {
@@ -82,7 +57,7 @@ public class IgCacheFactory implements ServerCacheFactory {
 //      if (properties != null) {
 //        configuration = new IgniteConfigBuilder("ignite", properties).build();
 //      } else {
-        configuration = new IgniteConfiguration();
+      configuration = new IgniteConfiguration();
 //      }
     }
 
@@ -91,23 +66,22 @@ public class IgCacheFactory implements ServerCacheFactory {
     }
 
     logger.debug("Starting Ignite");
-    ignite = Ignition.start(configuration);
-
-    messaging = ignite.message(ignite.cluster().forRemotes());
-    messaging.localListen(QC_INVALIDATE, new QueryCacheInvalidateListener());
-    messaging.localListen(TABLE_MOD, new TableModListener());
+    return Ignition.start(configuration);
   }
 
-  @Override
-  public ServerCacheNotify createCacheNotify(ServerCacheNotify listener) {
-    this.listener = listener;
-    return new IgServerCacheNotify();
+  private IgCacheFactory(ServerConfig serverConfig, BackgroundExecutor executor, ConfigManager configManager) {
+    super(executor, startIgnite(serverConfig, configManager));
+    this.configManager = configManager;
+  }
+
+  public static IgCacheFactory create(ServerConfig serverConfig, BackgroundExecutor executor) {
+    return new IgCacheFactory(serverConfig, executor, new ConfigManager(readConfiguration()));
   }
 
   /**
    * Read the L2 cache configuration.
    */
-  private L2Configuration readConfiguration() {
+  private static L2Configuration readConfiguration() {
 
     // check system property first
     String config = System.getProperty("ebeanIgniteConfig");
@@ -129,32 +103,9 @@ public class IgCacheFactory implements ServerCacheFactory {
     return ConfigXmlReader.read("/ebean-ignite-config.xml");
   }
 
-  private class QueryCacheInvalidateListener implements IgniteBiPredicate<UUID, String> {
-    @Override
-    public boolean apply(UUID uuid, String key) {
-      queryCacheInvalidate(key);
-      return true;
-    }
-  }
-
-  private class TableModListener implements IgniteBiPredicate<UUID, String> {
-    @Override
-    public boolean apply(UUID uuid, String rawMessage) {
-      processTableNotify(rawMessage);
-      return true;
-    }
-  }
 
   @Override
-  public ServerCache createCache(ServerCacheConfig config) {
-
-    if (config.isQueryCache()) {
-      return createQueryCache(config);
-    }
-    return createNormalCache(config);
-  }
-
-  private ServerCache createNormalCache(ServerCacheConfig config) {
+  protected <K,V> IgniteCache<K,V> createNormalCache(ServerCacheConfig config) {
 
     ConfigPair pair = configManager.getConfig(config.getType(), config.getCacheKey());
 
@@ -162,129 +113,11 @@ public class IgCacheFactory implements ServerCacheFactory {
     logger.debug("create cache - fullName:{}", fullName);
     pair.setName(fullName);
 
-    IgniteCache cache;
     if (pair.hasNearCache()) {
-      cache = ignite.getOrCreateCache(pair.getMain(), pair.getNear());
+      return ignite.getOrCreateCache(pair.getMain(), pair.getNear());
 
     } else {
-      cache = ignite.getOrCreateCache(pair.getMain());
-    }
-
-    return new IgCache(cache, config.getTenantProvider());
-  }
-
-  /**
-   * Return the full cache name (JMX safe name).
-   */
-  private String fullName(ServerCacheType type, String key) {
-    return type.name() + '-' + key;
-  }
-
-  /**
-   * Create a local/near query cache.
-   */
-  private ServerCache createQueryCache(ServerCacheConfig config) {
-    synchronized (this) {
-      IgQueryCache cache = queryCaches.get(config.getCacheKey());
-      if (cache == null) {
-        logger.debug("create query cache [{}]", config.getCacheKey());
-        cache = new IgQueryCache(new DefaultServerCacheConfig(config));
-        cache.periodicTrim(executor);
-        queryCaches.put(config.getCacheKey(), cache);
-      }
-      return cache;
+      return ignite.getOrCreateCache(pair.getMain());
     }
   }
-
-  /**
-   * Local only cache implementation with no serialisation requirements.
-   * <p>
-   * Uses Ignite topic to invalidate across the cluster.
-   * </p>
-   */
-  private class IgQueryCache extends DefaultServerQueryCache {
-
-    IgQueryCache(DefaultServerCacheConfig config) {
-      super(config);
-    }
-
-    @Override
-    public void clear() {
-      super.clear();
-      sendQueryCacheInvalidation(name);
-    }
-
-    /**
-     * Process the invalidation message coming from the cluster.
-     */
-    private void invalidate() {
-      queryLogger.debug("   CLEAR {}(*) - cluster invalidate", name);
-      super.clear();
-    }
-  }
-
-  /**
-   * Send the invalidation message to all members of the cluster.
-   */
-  private void sendQueryCacheInvalidation(String key) {
-    messaging.send(QC_INVALIDATE, key);
-  }
-
-  /**
-   * Clear the query cache if we have it.
-   */
-  private void queryCacheInvalidate(String key) {
-    IgQueryCache queryCache = queryCaches.get(key);
-    if (queryCache != null) {
-      queryCache.invalidate();
-    }
-  }
-
-  /**
-   * Process a remote dependent table modify event.
-   */
-  private void processTableNotify(String rawMessage) {
-
-    if (logger.isDebugEnabled()) {
-      logger.debug("processTableNotify {}", rawMessage);
-    }
-
-    String[] split = rawMessage.split(",");
-    Set<String> tables = new HashSet<>(Arrays.asList(split));
-    listener.notify(new ServerCacheNotification(tables));
-  }
-
-  /**
-   * Send the invalidation message to all members of the cluster.
-   */
-  private void sendTableMod(String key) {
-    messaging.send(TABLE_MOD, key);
-  }
-
-  /**
-   * Send the table modifications via Hazelcast topic.
-   */
-  class IgServerCacheNotify implements ServerCacheNotify {
-
-
-    @Override
-    public void notify(ServerCacheNotification tableModifications) {
-
-      Set<String> dependentTables = tableModifications.getDependentTables();
-      if (dependentTables != null && !dependentTables.isEmpty()) {
-
-        StringBuilder msg = new StringBuilder(50);
-        for (String table : dependentTables) {
-          msg.append(table).append(",");
-        }
-
-        String formattedMsg = msg.toString();
-        if (tableModLogger.isDebugEnabled()) {
-          tableModLogger.debug("Publish TableMods - {}", formattedMsg);
-        }
-        sendTableMod(formattedMsg);
-      }
-    }
-  }
-
 }
