@@ -1,38 +1,20 @@
 package io.ebean.ignite;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheConfig;
-import io.ebean.cache.ServerCacheFactory;
-import io.ebean.cache.ServerCacheNotification;
-import io.ebean.cache.ServerCacheNotify;
-import io.ebean.cache.ServerCacheType;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.ignite.config.ConfigManager;
 import io.ebean.ignite.config.ConfigPair;
 import io.ebean.ignite.config.ConfigXmlReader;
 import io.ebean.ignite.config.L2Configuration;
-import io.ebeaninternal.server.cache.DefaultServerCacheConfig;
-import io.ebeaninternal.server.cache.DefaultServerQueryCache;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
-import org.apache.ignite.IgniteMessaging;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.configuration.IgniteConfiguration;
-import org.apache.ignite.lang.IgniteBiPredicate;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Properties;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-
-//import org.avaje.ignite.IgniteConfigBuilder;
 
 /**
  * Factory for creating L2 server caches with Apache Ignite.
@@ -49,11 +31,11 @@ import java.util.concurrent.ConcurrentHashMap;
 public class IgCacheFactory extends IgCacheFactoryBase {
   private final ConfigManager configManager;
 
-  private static Ignite startIgnite(ServerConfig serverConfig, ConfigManager configManager) {
+  private static Ignite startIgnite(DatabaseConfig config, ConfigManager configManager) {
     // programmatically set into ServerConfig - typical DI setup
-    IgniteConfiguration configuration = (IgniteConfiguration) serverConfig.getServiceObject("igniteConfiguration");
+    IgniteConfiguration configuration = (IgniteConfiguration) config.getServiceObject("igniteConfiguration");
     if (configuration == null) {
-      Properties properties = serverConfig.getProperties();
+      Properties properties = config.getProperties();
 //      if (properties != null) {
 //        configuration = new IgniteConfigBuilder("ignite", properties).build();
 //      } else {
@@ -69,13 +51,13 @@ public class IgCacheFactory extends IgCacheFactoryBase {
     return Ignition.start(configuration);
   }
 
-  private IgCacheFactory(ServerConfig serverConfig, BackgroundExecutor executor, ConfigManager configManager) {
-    super(executor, startIgnite(serverConfig, configManager));
+  private IgCacheFactory(DatabaseConfig config, BackgroundExecutor executor, ConfigManager configManager) {
+    super(executor, startIgnite(config, configManager));
     this.configManager = configManager;
   }
 
-  public static IgCacheFactory create(ServerConfig serverConfig, BackgroundExecutor executor) {
-    return new IgCacheFactory(serverConfig, executor, new ConfigManager(readConfiguration()));
+  public static IgCacheFactory create(DatabaseConfig config, BackgroundExecutor executor) {
+    return new IgCacheFactory(config, executor, new ConfigManager(readConfiguration()));
   }
 
   /**
