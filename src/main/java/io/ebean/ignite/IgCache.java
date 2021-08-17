@@ -32,40 +32,40 @@ class IgCache implements ServerCache {
     return tenantAwareKey.key(key);
   }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public Map<Object, Object> getAll(Set<Object> keys) {
-  	try {
-			return cache.getAll(keys);
-	  } catch (Exception e) {
-		  logger.warn("Error calling cache GET. No ignite servers running?", e);
-		  // treat as miss
-		  return Collections.EMPTY_MAP;
-	  }
-	}
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<Object, Object> getAll(Set<Object> keys) {
+    try {
+      return cache.getAll(keys);
+    } catch (Exception e) {
+      logger.warn("Error calling cache GET. No ignite servers running?", e);
+      // treat as miss
+      return Collections.EMPTY_MAP;
+    }
+  }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void putAll(Map<Object, Object> keyValues) {
-		try {
-			cache.putAll(keyValues);
-		} catch (Exception e) {
-			logger.warn("Error calling cache GET. No ignite servers running?", e);
+  @Override
+  @SuppressWarnings("unchecked")
+  public void putAll(Map<Object, Object> keyValues) {
+    try {
+      cache.putAll(keyValues);
+    } catch (Exception e) {
+      logger.warn("Error calling cache GET. No ignite servers running?", e);
 
-		}
-	}
+    }
+  }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public void removeAll(Set<Object> keys) {
-		try {
-			cache.removeAll(keys);
-		} catch (Exception e) {
-			logger.warn("Error calling cache GET. No ignite servers running?", e);
-		}
-	}
+  @Override
+  @SuppressWarnings("unchecked")
+  public void removeAll(Set<Object> keys) {
+    try {
+      cache.removeAll(keys);
+    } catch (Exception e) {
+      logger.warn("Error calling cache GET. No ignite servers running?", e);
+    }
+  }
 
-	@Override
+  @Override
   @SuppressWarnings("unchecked")
   public Object get(Object id) {
     try {

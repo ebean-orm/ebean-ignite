@@ -87,7 +87,7 @@ public class IgCacheFactory extends IgCacheFactoryBase {
 
 
   @Override
-  protected <K,V> IgniteCache<K,V> createNormalCache(ServerCacheConfig config) {
+  protected <K, V> IgniteCache<K, V> createNormalCache(ServerCacheConfig config) {
 
     ConfigPair pair = configManager.getConfig(config.getType(), config.getCacheKey());
 

@@ -96,7 +96,7 @@ public class ConfigManager {
     } else {
       NearCacheConfiguration near = new NearCacheConfiguration();
       near.setNearEvictionPolicyFactory(new LruEvictionPolicyFactory(config.getNearSize()));
-      return  near;
+      return near;
     }
   }
 
@@ -111,8 +111,8 @@ public class ConfigManager {
         return isMatch(l2CacheMatch.isTypeKey(), key, l2CacheMatch);
       case COLLECTION_IDS:
         return isMatch(l2CacheMatch.isTypeManyId(), key, l2CacheMatch);
-      default :
-        throw new IllegalStateException("Unknown type "+type);
+      default:
+        throw new IllegalStateException("Unknown type " + type);
     }
   }
 
