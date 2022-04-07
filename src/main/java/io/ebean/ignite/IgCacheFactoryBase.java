@@ -39,7 +39,6 @@ public abstract class IgCacheFactoryBase implements ServerCacheFactory {
 
   private ServerCacheNotify listener;
 
-
   protected IgCacheFactoryBase(BackgroundExecutor executor, Ignite ignite) {
     this.executor = executor;
     this.queryCaches = new ConcurrentHashMap<>();
@@ -73,11 +72,10 @@ public abstract class IgCacheFactoryBase implements ServerCacheFactory {
 
   @Override
   public ServerCache createCache(ServerCacheConfig config) {
-
     if (config.isQueryCache()) {
-      return createQueryCache(config);
+      return config.tenantAware(createQueryCache(config));
     }
-    return new IgCache(createNormalCache(config), config.getTenantProvider());
+    return config.tenantAware(new IgCache(createNormalCache(config)));
   }
 
   protected abstract <K, V> IgniteCache<K, V> createNormalCache(ServerCacheConfig config);

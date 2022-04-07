@@ -1,9 +1,6 @@
 package io.ebean.ignite;
 
 import io.ebean.cache.ServerCache;
-import io.ebean.cache.ServerCacheStatistics;
-import io.ebean.cache.TenantAwareKey;
-import io.ebean.config.CurrentTenantProvider;
 import org.apache.ignite.IgniteCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,15 +18,8 @@ class IgCache implements ServerCache {
 
   private final IgniteCache cache;
 
-  private final TenantAwareKey tenantAwareKey;
-
-  IgCache(IgniteCache cache, CurrentTenantProvider tenantProvider) {
+  IgCache(IgniteCache cache) {
     this.cache = cache;
-    this.tenantAwareKey = new TenantAwareKey(tenantProvider);
-  }
-
-  private Object key(Object key) {
-    return tenantAwareKey.key(key);
   }
 
   @Override
@@ -67,9 +57,9 @@ class IgCache implements ServerCache {
 
   @Override
   @SuppressWarnings("unchecked")
-  public Object get(Object id) {
+  public Object get(Object key) {
     try {
-      return cache.get(key(id));
+      return cache.get(key);
     } catch (Exception e) {
       logger.warn("Error calling cache GET. No ignite servers running?", e);
       // treat as miss
@@ -79,9 +69,9 @@ class IgCache implements ServerCache {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void put(Object id, Object value) {
+  public void put(Object key, Object value) {
     try {
-      cache.put(key(id), value);
+      cache.put(key, value);
     } catch (Exception e) {
       logger.warn("Error calling cache PUT. No ignite servers running?", e);
     }
@@ -89,9 +79,9 @@ class IgCache implements ServerCache {
 
   @Override
   @SuppressWarnings("unchecked")
-  public void remove(Object id) {
+  public void remove(Object key) {
     try {
-      cache.remove(key(id));
+      cache.remove(key);
     } catch (Exception e) {
       logger.warn("Error calling cache REMOVE. No ignite servers running?", e);
     }
@@ -114,17 +104,5 @@ class IgCache implements ServerCache {
       logger.warn("Error calling cache SIZE. No ignite servers running?", e);
       return 0;
     }
-  }
-
-  @Override
-  public int getHitRatio() {
-    // we can get this from cache.metrics();
-    return 0;
-  }
-
-  @Override
-  public ServerCacheStatistics getStatistics(boolean reset) {
-    // get this from cache.metrics(); ?
-    return null;
   }
 }

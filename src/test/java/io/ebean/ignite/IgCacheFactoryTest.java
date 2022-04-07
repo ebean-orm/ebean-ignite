@@ -1,11 +1,11 @@
 package io.ebean.ignite;
 
-import io.ebean.Ebean;
-import io.ebean.EbeanServer;
-import io.ebean.EbeanServerFactory;
+import io.ebean.DB;
+import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.config.ServerConfig;
+import io.ebean.config.DatabaseConfig;
 import main.Server;
 import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.logger.slf4j.Slf4jLogger;
@@ -19,9 +19,9 @@ import static org.junit.Assert.assertNotNull;
 
 public class IgCacheFactoryTest {
 
-  private static EbeanServer server;
+  private final static Database server;
 
-  private static Server igniteServer;
+  private final static Server igniteServer;
 
   static {
     igniteServer = new Server("testServer");
@@ -29,30 +29,30 @@ public class IgCacheFactoryTest {
     IgniteConfiguration igniteConfiguration = new IgniteConfiguration();
     igniteConfiguration.setGridLogger(new Slf4jLogger());
 
-    ServerConfig serverConfig = new ServerConfig();
+    DatabaseConfig serverConfig = new DatabaseConfig();
     serverConfig.loadFromProperties();
 
     serverConfig.putServiceObject("igniteConfiguration", igniteConfiguration);
 
-    server = EbeanServerFactory.create(serverConfig);
+    server = DatabaseFactory.create(serverConfig);
   }
 
 
   @Test
   public void integration() {
 
-    ServerCacheManager cacheManager = server.getServerCacheManager();
-    ServerCache beanCache = cacheManager.getBeanCache(EFoo.class);
+    ServerCacheManager cacheManager = server.cacheManager();
+    ServerCache beanCache = cacheManager.beanCache(EFoo.class);
 
     assertThat(beanCache).isInstanceOf(IgCache.class);
 
     EFoo foo = new EFoo("bar");
     foo.save();
 
-    EFoo fetch1 = Ebean.find(EFoo.class, foo.getId());
+    EFoo fetch1 = DB.find(EFoo.class, foo.getId());
     System.out.println("f" + fetch1);
 
-    EFoo fetch2 = Ebean.find(EFoo.class, foo.getId());
+    EFoo fetch2 = DB.find(EFoo.class, foo.getId());
     System.out.println("f" + fetch2);
   }
 
@@ -62,12 +62,12 @@ public class IgCacheFactoryTest {
     EFoo foo = new EFoo("hello");
     foo.save();
 
-    EFoo fetch1 = Ebean.find(EFoo.class)
+    EFoo fetch1 = DB.find(EFoo.class)
         .setId(foo.getId())
         .select("name, status, notes, version")
         .findOne();
 
-    EFoo fetch2 = Ebean.find(EFoo.class)
+    EFoo fetch2 = DB.find(EFoo.class)
         .setId(foo.getId())
         .select("name, status, notes, version")
         .findOne();
@@ -82,7 +82,7 @@ public class IgCacheFactoryTest {
 
     Thread.sleep(20);
 
-    EFoo fetch3 = Ebean.find(EFoo.class)
+    EFoo fetch3 = DB.find(EFoo.class)
         .setId(foo.getId())
         .select("name, status, notes, version")
         .findOne();
@@ -108,24 +108,24 @@ public class IgCacheFactoryTest {
     new EFoo("one2").save();
     new EFoo("one3").save();
 
-    Ebean.find(EFoo.class)
+    DB.find(EFoo.class)
         .setUseQueryCache(true)
         .where().startsWith("name", "one")
         .findList();
 
-    Ebean.find(EFoo.class)
+    DB.find(EFoo.class)
         .setUseQueryCache(true)
         .where().startsWith("name", "one")
         .findList();
 
     new EFoo("one4").save();
 
-    Ebean.find(EFoo.class)
+    DB.find(EFoo.class)
         .setUseQueryCache(true)
         .where().startsWith("name", "one")
         .findList();
 
-    Ebean.find(EFoo.class)
+    DB.find(EFoo.class)
         .setUseQueryCache(true)
         .where().startsWith("name", "one")
         .findList();
