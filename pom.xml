@@ -18,7 +18,7 @@
   </scm>
 
   <properties>
-    <ignite.version>2.12.0</ignite.version>
+    <ignite.version>2.17.0</ignite.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
